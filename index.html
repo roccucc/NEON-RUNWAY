@@ -1,0 +1,1820 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111114">
+  <title>Neon Runway — La strada per la passerella</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f4f0e9;
+      --muted: #a7a29d;
+      --panel: rgba(25, 24, 27, .88);
+      --panel-soft: rgba(35, 33, 37, .82);
+      --line: rgba(255, 255, 255, .1);
+      --pink: #f4a1bf;
+      --gold: #efc783;
+      --green: #a8d7b4;
+      --red: #f28c86;
+      --shadow: 0 24px 70px rgba(0, 0, 0, .35);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      color: var(--ink);
+      background: #101013;
+    }
+    button { font: inherit; }
+    button:focus-visible { outline: 2px solid var(--pink); outline-offset: 3px; }
+    .city {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 75% 15%, rgba(151, 92, 111, .36), transparent 34%),
+        radial-gradient(ellipse at 18% 65%, rgba(57, 91, 101, .26), transparent 38%),
+        linear-gradient(160deg, #34343b 0%, #1d2027 43%, #111114 86%);
+    }
+    .city::before, .city::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      width: 130%;
+      height: 45%;
+      left: -12%;
+      background:
+        linear-gradient(90deg, transparent 4%, rgba(246, 202, 139, .34) 4.3%, transparent 4.8%) 0 10px / 72px 42px,
+        linear-gradient(90deg, transparent 14%, rgba(244, 161, 191, .34) 14.5%, transparent 15%) 0 28px / 110px 55px,
+        repeating-linear-gradient(90deg, #17181d 0 38px, #202127 39px 74px, #15161a 75px 116px);
+      clip-path: polygon(0 26%, 4% 26%, 4% 6%, 12% 6%, 12% 30%, 18% 30%, 18% 0, 26% 0, 26% 25%, 33% 25%, 33% 12%, 42% 12%, 42% 37%, 50% 37%, 50% 5%, 58% 5%, 58% 29%, 64% 29%, 64% 15%, 72% 15%, 72% 34%, 81% 34%, 81% 9%, 88% 9%, 88% 30%, 95% 30%, 95% 18%, 100% 18%, 100% 100%, 0 100%);
+      opacity: .8;
+      filter: drop-shadow(0 -10px 24px rgba(0, 0, 0, .2));
+    }
+    .city::after {
+      height: 25%;
+      left: 0;
+      width: 100%;
+      background: linear-gradient(0deg, #101013 5%, transparent), linear-gradient(90deg, transparent, rgba(237, 177, 130, .2), transparent);
+      clip-path: none;
+      opacity: .7;
+    }
+    .grain {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: .1;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E");
+    }
+    .shell { width: min(1380px, calc(100% - 44px)); margin: 0 auto; padding: 22px 0 42px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 20px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      display: grid; place-items: center; width: 42px; height: 42px;
+      border: 1px solid rgba(244, 161, 191, .52); border-radius: 13px;
+      color: var(--pink); background: rgba(244, 161, 191, .1);
+      font-family: Georgia, serif; font-size: 23px; font-style: italic;
+    }
+    .brand-name { font-family: Georgia, "Times New Roman", serif; font-size: 19px; letter-spacing: .07em; }
+    .brand-sub { margin-top: 2px; color: var(--muted); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; }
+    .top-right { display: flex; align-items: center; gap: 10px; }
+    .day-pill, .cash-pill {
+      display: inline-flex; align-items: center; gap: 9px;
+      min-height: 39px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px;
+      background: rgba(23, 22, 25, .75); font-size: 12px;
+    }
+    .cash-pill { color: var(--gold); font-weight: 750; }
+    .day-pill { color: #ded8d2; }
+    .day-pill b { color: var(--pink); }
+    .icon-button {
+      width: 39px; height: 39px; border: 1px solid var(--line); border-radius: 50%;
+      color: var(--muted); background: rgba(23, 22, 25, .75); cursor: pointer;
+    }
+    .icon-button:hover { color: var(--ink); border-color: rgba(255,255,255,.3); }
+
+    .intro {
+      position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+      min-height: 176px; margin-bottom: 17px; padding: 28px 34px;
+      overflow: hidden; border: 1px solid var(--line); border-radius: 20px;
+      background:
+        linear-gradient(90deg, rgba(15, 15, 18, .97) 0%, rgba(15, 15, 18, .86) 42%, rgba(15,15,18,.2) 100%),
+        radial-gradient(ellipse at 76% 18%, rgba(243, 163, 183, .39), transparent 36%),
+        linear-gradient(130deg, #483339, #20252d 60%, #39383a);
+      box-shadow: var(--shadow);
+    }
+    .intro::after {
+      content: "N° 07"; position: absolute; right: 7%; top: 13%;
+      color: rgba(255,255,255,.18); font-family: Georgia, serif; font-size: clamp(72px, 12vw, 150px); font-style: italic;
+      letter-spacing: -.08em; transform: rotate(-8deg);
+    }
+    .intro-copy { position: relative; z-index: 1; max-width: 660px; }
+    .eyebrow { color: var(--pink); font-size: 10px; font-weight: 750; letter-spacing: .24em; text-transform: uppercase; }
+    h1 { margin: 10px 0 8px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(31px, 4vw, 49px); font-weight: 400; letter-spacing: -.035em; }
+    .intro p { max-width: 600px; margin: 0; color: #c1bab5; font-size: 13px; line-height: 1.65; }
+    .objective {
+      position: relative; z-index: 1; display: flex; flex-direction: column; gap: 8px;
+      width: 205px; padding: 14px 16px; border: 1px solid rgba(255,255,255,.14); border-radius: 13px;
+      background: rgba(15, 15, 18, .58); backdrop-filter: blur(8px);
+    }
+    .objective small { color: var(--muted); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
+    .objective strong { font-family: Georgia, serif; font-size: 16px; font-weight: 400; }
+    .objective-progress { height: 4px; overflow: hidden; border-radius: 4px; background: rgba(255,255,255,.14); }
+    .objective-progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--pink), var(--gold)); transition: width .4s ease; }
+
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 16px; align-items: start; }
+    .main-column { min-width: 0; }
+    .tabs {
+      display: flex; gap: 5px; width: fit-content; max-width: 100%; margin-bottom: 12px; padding: 5px;
+      overflow-x: auto; border: 1px solid var(--line); border-radius: 13px; background: rgba(20,19,22,.86);
+    }
+    .tab {
+      padding: 9px 13px; border: 0; border-radius: 9px; color: var(--muted);
+      background: transparent; font-size: 11px; font-weight: 650; cursor: pointer; white-space: nowrap;
+    }
+    .tab:hover { color: var(--ink); }
+    .tab.active { color: #20181b; background: var(--pink); }
+    .panel {
+      min-height: 450px; padding: 23px; border: 1px solid var(--line); border-radius: 17px;
+      background: var(--panel); box-shadow: var(--shadow); backdrop-filter: blur(14px);
+    }
+    .panel-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; margin-bottom: 19px; }
+    .panel h2 { margin: 0; font-family: Georgia, serif; font-size: 25px; font-weight: 400; }
+    .panel-lede { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .location-tag { padding: 7px 10px; border: 1px solid var(--line); border-radius: 999px; color: #c9c1bb; font-size: 10px; white-space: nowrap; }
+    .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+    .action-card {
+      position: relative; display: flex; min-height: 158px; flex-direction: column; align-items: flex-start;
+      padding: 16px; overflow: hidden; border: 1px solid var(--line); border-radius: 13px;
+      text-align: left; color: var(--ink); background: var(--panel-soft); cursor: pointer;
+      transition: border-color .2s, transform .2s, background .2s;
+    }
+    .action-card:hover:not(:disabled) { transform: translateY(-2px); border-color: rgba(244, 161, 191, .55); background: rgba(57, 46, 52, .9); }
+    .action-card:disabled { cursor: not-allowed; opacity: .46; }
+    .card-icon { display: grid; place-items: center; width: 35px; height: 35px; margin-bottom: 11px; border-radius: 10px; color: var(--pink); background: rgba(244, 161, 191, .1); font-size: 17px; }
+    .card-title { font-size: 13px; font-weight: 750; }
+    .card-description { max-width: 95%; margin-top: 5px; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .card-meta { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: auto; padding-top: 13px; color: var(--gold); font-size: 11px; font-weight: 750; }
+    .card-meta small { color: var(--muted); font-size: 9px; font-weight: 500; }
+    .card-tag {
+      position: absolute; top: 13px; right: 12px; padding: 4px 7px; border-radius: 99px;
+      color: #29211b; background: var(--gold); font-size: 8px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+    }
+    .split-card { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-top: 11px; }
+    .compact-card { min-height: 102px; flex-direction: row; align-items: center; gap: 12px; }
+    .compact-card .card-icon { flex: 0 0 35px; margin: 0; }
+    .compact-card .card-meta { width: auto; margin: 0 0 0 auto; padding: 0; white-space: nowrap; }
+    .compact-copy { min-width: 0; }
+    .compact-copy .card-description { max-width: 170px; }
+    .inline-note { margin: 14px 0 0; padding: 12px 14px; border-left: 2px solid var(--gold); color: #c6bdb4; background: rgba(239, 199, 131, .07); font-size: 10px; line-height: 1.55; }
+    .runway-panel { margin: 14px 0; padding: 16px; border: 1px solid rgba(239,199,131,.32); border-radius: 13px; background: linear-gradient(120deg,rgba(239,199,131,.1),rgba(244,161,191,.06)); }
+    .runway-panel strong { display: block; color: var(--gold); font-family: Georgia,serif; font-size: 18px; font-weight: 400; }
+    .runway-panel p { margin: 6px 0 12px; color: #d1c9c1; font-size: 10px; line-height: 1.5; }
+    .runway-panel .cta { margin-top: 2px; }
+    .shop-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; }
+    .shop-card { min-height: 220px; }
+    .product-visual {
+      display: grid; place-items: center; width: 100%; height: 85px; margin-bottom: 13px;
+      border: 1px solid rgba(255,255,255,.06); border-radius: 10px; color: var(--pink);
+      background: radial-gradient(ellipse, rgba(244,161,191,.14), transparent 67%), #242127;
+      font-family: Georgia, serif; font-size: 37px;
+    }
+    .product-visual.regular { color: var(--green); background: radial-gradient(ellipse, rgba(168,215,180,.14), transparent 67%), #202623; }
+    .shop-card .card-title { font-family: Georgia, serif; font-size: 15px; font-weight: 400; }
+    .shop-card .card-description { min-height: 30px; }
+    .shop-card .card-meta { padding-top: 10px; }
+    .luxury-card { display: flex; min-width: 0; flex-direction: column; padding: 12px; border: 1px solid var(--line); border-radius: 13px; background: var(--panel-soft); }
+    .luxury-image { position: relative; display: grid; place-items: center; height: 148px; margin-bottom: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,.09); border-radius: 10px; background: radial-gradient(ellipse at 50% 36%, rgba(244,161,191,.2), transparent 52%), linear-gradient(145deg,#333038,#1c1b20 66%,#29242a); }
+    .luxury-image::before { content: ""; position: absolute; top: -25%; left: 50%; width: 70%; height: 110%; transform: translateX(-50%); background: linear-gradient(100deg, transparent, rgba(255,255,255,.035), transparent); }
+    .luxury-image::after { content: ""; position: absolute; right: 12%; bottom: 13px; left: 12%; height: 1px; background: linear-gradient(90deg,transparent,rgba(239,199,131,.32),transparent); }
+    .luxury-image svg { position: relative; z-index: 1; width: 126px; height: 132px; overflow: visible; filter: drop-shadow(0 10px 9px rgba(0,0,0,.52)); }
+    .closet-empty { padding: 32px 18px; border: 1px dashed rgba(255,255,255,.16); border-radius: 14px; color: var(--muted); text-align: center; background: rgba(255,255,255,.025); }
+    .closet-empty strong { display: block; margin-bottom: 7px; color: var(--ink); font-family: Georgia,serif; font-size: 19px; font-weight: 400; }
+    .closet-group { margin: 20px 0 11px; color: var(--gold); font-size: 10px; font-weight: 750; letter-spacing: .15em; text-transform: uppercase; }
+    .closet-item .luxury-category { margin-top: 4px; }
+    .outfit-builder { margin-top: 26px; padding: 18px; border: 1px solid rgba(244,161,191,.2); border-radius: 14px; background: rgba(244,161,191,.045); }
+    .outfit-builder h3 { margin: 0; font-family: Georgia,serif; font-size: 21px; font-weight: 400; }
+    .outfit-builder > p { margin: 6px 0 15px; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .outfit-mode { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .outfit-mode button { padding: 8px 11px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: rgba(255,255,255,.035); font-size: 10px; cursor: pointer; }
+    .outfit-mode button.selected { border-color: rgba(244,161,191,.65); color: var(--pink); background: rgba(244,161,191,.1); }
+    .outfit-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 11px; }
+    .outfit-field label { display: block; margin-bottom: 6px; color: #ddd6cf; font-size: 10px; font-weight: 650; }
+    .outfit-field select { width: 100%; min-height: 38px; padding: 0 9px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: #232126; font: inherit; font-size: 10px; }
+    .outfit-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
+    .outfit-hint { color: var(--muted); font-size: 9px; line-height: 1.45; }
+    .worn-look { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 13px; }
+    .worn-look-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px 7px 6px; border: 1px solid var(--line); border-radius: 9px; color: #ddd6cf; background: rgba(255,255,255,.035); font-size: 9px; }
+    .worn-look-item svg { width: 36px; height: 36px; }
+    .luxury-category { margin: 0 0 5px; color: var(--gold); font-size: 8px; letter-spacing: .14em; text-transform: uppercase; }
+    .luxury-card .card-title { display: block; min-height: 32px; font-family: Georgia, serif; font-size: 14px; font-weight: 400; }
+    .luxury-card .card-description { min-height: 34px; margin: 5px 0 9px; color: var(--muted); font-size: 9px; line-height: 1.45; }
+    .color-choice-label { margin-bottom: 6px; color: var(--muted); font-size: 9px; }
+    .color-choices { display: flex; flex-wrap: wrap; gap: 6px; min-height: 20px; margin-bottom: 10px; }
+    .color-choice { width: 17px; height: 17px; padding: 0; border: 2px solid rgba(255,255,255,.25); border-radius: 50%; background: var(--swatch); cursor: pointer; }
+    .color-choice.selected { outline: 2px solid var(--pink); outline-offset: 2px; }
+    .luxury-card .cta { width: 100%; margin-top: auto; }
+    .health-warning { margin: 14px 0; padding: 13px 15px; border: 1px solid rgba(242,140,134,.35); border-radius: 12px; background: rgba(242,140,134,.08); }
+    .health-warning strong { color: var(--red); font-size: 12px; }
+    .health-warning p { margin: 5px 0 10px; color: #d3c7c1; font-size: 10px; line-height: 1.5; }
+    .health-warning .cta { margin-top: 4px; }
+    .emergency-note { display: block; margin-top: 7px; color: var(--muted); font-size: 9px; }
+    .status-tag { padding: 6px 9px; border: 1px solid var(--line); border-radius: 999px; color: var(--green); font-size: 9px; }
+    .style-options { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .style-card { min-height: 139px; }
+    .style-chip { display: inline-flex; align-items: center; gap: 7px; margin: 0 5px 5px 0; padding: 5px 8px; border: 1px solid var(--line); border-radius: 99px; color: #d3ccc5; font-size: 9px; }
+    .swatch { width: 9px; height: 9px; border-radius: 50%; background: var(--swatch); }
+    .portfolio-card {
+      display: flex; align-items: center; gap: 16px; margin-top: 11px; padding: 17px;
+      border: 1px solid rgba(239,199,131,.2); border-radius: 13px; background: rgba(239,199,131,.055);
+    }
+    .portfolio-art { display: grid; place-items: center; flex: 0 0 54px; height: 62px; border-radius: 8px; color: var(--gold); background: rgba(239,199,131,.1); font-family: Georgia, serif; font-size: 27px; }
+    .portfolio-copy { flex: 1; }
+    .portfolio-copy strong { font-family: Georgia, serif; font-size: 15px; font-weight: 400; }
+    .portfolio-copy p { margin: 5px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .cta {
+      min-height: 35px; padding: 0 12px; border: 1px solid rgba(244,161,191,.42); border-radius: 9px;
+      color: #241a1e; background: var(--pink); font-size: 10px; font-weight: 800; cursor: pointer;
+      transition: filter .2s, transform .2s;
+    }
+    .cta:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+    .cta:disabled { cursor: not-allowed; opacity: .45; }
+    .cta.subtle { border-color: var(--line); color: var(--ink); background: rgba(255,255,255,.07); }
+
+    .sidebar { display: flex; flex-direction: column; gap: 12px; }
+    .side-panel { padding: 17px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); box-shadow: var(--shadow); backdrop-filter: blur(14px); }
+    .side-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .side-heading h3 { margin: 0; font-family: Georgia, serif; font-size: 17px; font-weight: 400; }
+    .side-heading span { color: var(--muted); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+    .avatar-wrap {
+      display: flex; align-items: center; justify-content: center; height: 145px; margin-bottom: 14px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,.07); border-radius: 12px;
+      background: radial-gradient(ellipse at 52% 33%, rgba(244,161,191,.2), transparent 38%), linear-gradient(135deg,#2c262d,#1c2026);
+    }
+    .avatar-svg { height: 155px; width: 150px; margin-top: 23px; }
+    .avatar-hair { fill: var(--hair, #33252b); }
+    .avatar-brow { fill: var(--brow, #33252b); }
+    .avatar-top { fill: var(--outfit, #b9aaa5); }
+    .avatar-face { fill: var(--skin, #d8a88f); }
+    .avatar-details { fill: none; stroke: #563d3c; stroke-linecap: round; stroke-width: 1.7; }
+    .model-name { display: flex; align-items: center; justify-content: space-between; margin: 2px 0 13px; }
+    .model-name strong { font-family: Georgia, serif; font-size: 15px; font-weight: 400; }
+    .model-name span { color: var(--pink); font-size: 9px; }
+    .stat { margin: 10px 0; }
+    .stat-top { display: flex; justify-content: space-between; margin-bottom: 6px; color: #ded8d1; font-size: 10px; }
+    .stat-top span:last-child { color: var(--muted); }
+    .meter { height: 5px; overflow: hidden; border-radius: 5px; background: rgba(255,255,255,.1); }
+    .meter span { display: block; width: 50%; height: 100%; border-radius: inherit; background: var(--bar, var(--pink)); transition: width .3s ease; }
+    .inventory { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .inventory-item { padding: 9px 10px; border: 1px solid rgba(255,255,255,.07); border-radius: 9px; background: rgba(255,255,255,.025); }
+    .inventory-item span { display: block; color: var(--muted); font-size: 9px; }
+    .inventory-item strong { display: block; margin-top: 4px; font-size: 12px; }
+    .inventory-item .good { color: var(--green); }
+    .inventory-item .warn { color: var(--gold); }
+    .inventory-item .bad { color: var(--red); }
+    .closet-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--line); }
+    .closet-row span { color: var(--muted); font-size: 10px; }
+    .closet-row strong { color: var(--gold); font-size: 11px; }
+    .rent-row { display: flex; justify-content: space-between; align-items: center; margin-top: 9px; color: var(--muted); font-size: 10px; }
+    .rent-row strong { color: var(--ink); font-size: 11px; }
+    .pay-rent { width: 100%; margin-top: 11px; }
+    .log-panel { padding-bottom: 12px; }
+    .log-list { display: flex; flex-direction: column; gap: 9px; }
+    .log-entry { display: flex; align-items: flex-start; gap: 8px; color: #c7c0ba; font-size: 10px; line-height: 1.45; }
+    .log-dot { flex: 0 0 6px; width: 6px; height: 6px; margin-top: 4px; border-radius: 50%; background: var(--pink); box-shadow: 0 0 9px rgba(244,161,191,.6); }
+    .toast {
+      position: fixed; right: 22px; bottom: 22px; z-index: 10; max-width: min(390px, calc(100% - 44px));
+      padding: 13px 17px; border: 1px solid rgba(244,161,191,.36); border-radius: 12px;
+      color: var(--ink); background: rgba(27,24,28,.96); box-shadow: var(--shadow); font-size: 12px; line-height: 1.5;
+      opacity: 0; transform: translateY(12px); pointer-events: none; transition: .25s ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .overlay {
+      position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px;
+      background: rgba(9,9,11,.82); backdrop-filter: blur(12px);
+    }
+    .modal {
+      width: min(560px, 100%); max-height: min(92vh, 790px); overflow: auto; padding: 26px;
+      border: 1px solid rgba(244,161,191,.24); border-radius: 20px; background: #1b191d; box-shadow: 0 32px 100px #0009;
+    }
+    .modal h2 { margin: 8px 0; font-family: Georgia, serif; font-size: 29px; font-weight: 400; }
+    .modal > p { margin: 0 0 18px; color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .setup-preview { display: flex; align-items: center; gap: 16px; margin: 16px 0; padding: 13px; border: 1px solid var(--line); border-radius: 13px; background: var(--panel-soft); }
+    .setup-preview .avatar-wrap { width: 105px; height: 95px; margin: 0; flex: 0 0 105px; }
+    .setup-preview .avatar-svg { width: 100px; height: 120px; }
+    .setup-preview-copy strong { font-family: Georgia, serif; font-size: 16px; font-weight: 400; }
+    .setup-preview-copy p { margin: 5px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .setup-group { margin: 15px 0; }
+    .setup-label { display: flex; justify-content: space-between; margin-bottom: 8px; color: #ddd6cf; font-size: 11px; font-weight: 650; }
+    .setup-label small { color: var(--gold); font-size: 10px; font-weight: 500; }
+    .name-input { width: 100%; min-height: 39px; padding: 0 11px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: rgba(255,255,255,.045); font: inherit; font-size: 12px; }
+    .name-input:focus { outline: 2px solid rgba(244,161,191,.65); outline-offset: 2px; }
+    .choice-row { display: flex; flex-wrap: wrap; gap: 7px; }
+    .choice {
+      min-height: 33px; padding: 0 11px; border: 1px solid var(--line); border-radius: 8px; color: #d6cec8;
+      background: rgba(255,255,255,.035); font-size: 10px; cursor: pointer;
+    }
+    .choice:hover { border-color: rgba(255,255,255,.28); }
+    .choice.selected { border-color: rgba(244,161,191,.65); color: var(--pink); background: rgba(244,161,191,.09); }
+    .setup-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+    .setup-wallet { color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .setup-wallet strong { display: block; color: var(--gold); font-size: 15px; }
+    .modal .cta { min-height: 42px; padding: 0 17px; }
+    .game-over { text-align: center; }
+    .game-over .brand-mark { margin: 0 auto 15px; }
+    .game-over .cta { margin-top: 12px; }
+    .surprise-overlay { z-index: 25; }
+    .surprise-modal { border-color: rgba(239,199,131,.48); text-align: center; }
+    .surprise-modal .brand-mark { margin: 0 auto 15px; border-color: rgba(239,199,131,.55); color: var(--gold); background: rgba(239,199,131,.1); }
+    .surprise-modal .eyebrow { color: var(--gold); }
+    .award-overlay { z-index: 30; }
+    .award-modal { width: min(680px,100%); border-color: rgba(239,199,131,.5); text-align: center; }
+    .award-modal .eyebrow { color: var(--gold); }
+    .award-scene {
+      position: relative; display: grid; place-items: center; min-height: 270px; margin: 18px 0;
+      overflow: hidden; border: 1px solid rgba(239,199,131,.28); border-radius: 15px;
+      background: radial-gradient(ellipse at 50% 70%,rgba(239,199,131,.24),transparent 48%),linear-gradient(180deg,#342735,#17161b 82%);
+    }
+    .award-curtain { position: absolute; inset: 0; opacity: .4; background: repeating-linear-gradient(90deg,transparent 0 36px,rgba(244,161,191,.12) 37px 39px,transparent 40px 72px); }
+    .award-confetti { position: absolute; inset: -35% 0 0; opacity: .75; background-image: radial-gradient(circle,#efc783 0 2px,transparent 3px),radial-gradient(circle,#f4a1bf 0 2px,transparent 3px),radial-gradient(circle,#f4f0e9 0 1.5px,transparent 2.5px); background-position: 8% 12%,52% 25%,86% 18%; background-size: 87px 74px,113px 98px,67px 82px; animation: award-confetti-fall 3.2s linear infinite; }
+    .award-avatar { z-index: 1; align-self: end; width: 190px; height: 235px; margin: 25px 0 0; border-color: rgba(239,199,131,.4); background: linear-gradient(180deg,rgba(239,199,131,.09),rgba(17,16,19,.78)); animation: award-model-arrive .9s cubic-bezier(.2,.8,.2,1) both; }
+    .award-avatar .avatar-svg { width: 180px; height: 225px; margin-top: 35px; }
+    .award-trophy { position: absolute; z-index: 2; top: 24px; right: max(9%,calc(50% - 155px)); font-size: 55px; filter: drop-shadow(0 5px 15px rgba(239,199,131,.6)); animation: award-trophy-arrive .7s .55s cubic-bezier(.2,.8,.2,1) both; }
+    .award-podium { position: absolute; right: 20%; bottom: 0; left: 20%; height: 33px; border: 1px solid rgba(239,199,131,.46); border-bottom: 0; border-radius: 40% 40% 0 0; background: linear-gradient(180deg,rgba(239,199,131,.26),rgba(105,71,38,.22)); }
+    .award-modal h2 { color: var(--gold); }
+    .award-modal .cta { margin-top: 4px; }
+    @keyframes award-model-arrive { from { opacity: 0; transform: translateY(80px) scale(.86); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes award-trophy-arrive { from { opacity: 0; transform: translateY(-45px) scale(.5) rotate(-18deg); } to { opacity: 1; transform: translateY(0) scale(1) rotate(0); } }
+    @keyframes award-confetti-fall { to { background-position: 8% 112%,52% 125%,86% 118%; } }
+    .hidden { display: none !important; }
+    .footer-note { margin: 14px 2px 0; color: rgba(230,225,220,.43); font-size: 9px; text-align: right; letter-spacing: .03em; }
+
+    @media (max-width: 920px) {
+      .layout { grid-template-columns: minmax(0, 1fr) 270px; }
+      .panel { padding: 18px; }
+      .shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 720px) {
+      .shell { width: min(100% - 24px, 560px); padding-top: 12px; }
+      .topbar { margin-bottom: 12px; }
+      .brand-name { font-size: 16px; }
+      .brand-sub { font-size: 8px; }
+      .brand-mark { width: 37px; height: 37px; }
+      .day-pill, .cash-pill { min-height: 34px; padding: 0 10px; font-size: 10px; }
+      .top-right { gap: 6px; }
+      .intro { min-height: 185px; padding: 22px; }
+      .intro p { max-width: 420px; font-size: 11px; }
+      .objective { width: 165px; padding: 11px; }
+      .objective strong { font-size: 13px; }
+      .layout { display: flex; flex-direction: column; }
+      .main-column, .sidebar { width: 100%; }
+      .sidebar { display: grid; grid-template-columns: 1fr 1fr; align-items: start; }
+      .log-panel { grid-column: 1 / -1; }
+      .panel { min-height: 0; }
+      .footer-note { text-align: center; }
+    }
+    @media (max-width: 490px) {
+      .intro { align-items: flex-start; flex-direction: column; min-height: 0; gap: 15px; }
+      .objective { width: 100%; }
+      .tabs { width: 100%; }
+      .tab { padding: 9px 10px; font-size: 10px; }
+      .cards, .style-options { grid-template-columns: 1fr; }
+      .outfit-fields { grid-template-columns: 1fr; }
+      .shop-grid { grid-template-columns: 1fr 1fr; }
+      .shop-card { min-height: 205px; }
+      .product-visual { height: 68px; }
+      .split-card { grid-template-columns: 1fr; }
+      .sidebar { grid-template-columns: 1fr; }
+      .log-panel { grid-column: auto; }
+      .portfolio-card { align-items: flex-start; flex-wrap: wrap; }
+      .portfolio-copy { min-width: calc(100% - 80px); }
+      .portfolio-card .cta { margin-left: 70px; }
+      .top-right .day-pill { gap: 4px; padding: 0 7px; }
+      .top-right .day-pill span { font-size: 0; }
+      .top-right .day-pill #dayCount { display: none; }
+      .top-right .day-pill #timeCount { font-size: 10px; }
+      .panel-header { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="city" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">N</div>
+        <div><div class="brand-name">NEON RUNWAY</div><div class="brand-sub">La strada per la passerella</div></div>
+      </div>
+      <div class="top-right">
+        <div class="day-pill">◷ <span>Giorno <b id="dayCount">1</b> · <b id="timeCount">06:00</b></span></div>
+        <div class="cash-pill"><span aria-hidden="true">€</span><span id="cashTop">32</span></div>
+        <button class="icon-button" id="resetButton" type="button" aria-label="Ricomincia la partita" title="Ricomincia">↻</button>
+      </div>
+    </header>
+
+    <section class="intro">
+      <div class="intro-copy">
+        <div class="eyebrow">Una città. Un sogno. Zero scorciatoie.</div>
+        <h1>La passerella non aspetta.</h1>
+        <p>Parti con pochi euro e un sogno enorme. Accetta lavori, paga l'affitto, riempi la dispensa e costruisci il tuo stile: le vetrine di lusso sono lì, ma prima bisogna arrivarci.</p>
+      </div>
+      <div class="objective">
+        <small>Il tuo grande obiettivo</small>
+        <strong id="objectiveText">Fatti notare da un'agenzia</strong>
+        <div class="objective-progress"><span id="objectiveBar"></span></div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <main class="main-column">
+        <nav class="tabs" aria-label="Luoghi">
+          <button class="tab active" data-tab="work" type="button">Lavori</button>
+          <button class="tab" data-tab="market" type="button">Market</button>
+          <button class="tab" data-tab="atelier" type="button">Boutique</button>
+          <button class="tab" data-tab="studio" type="button">Studio</button>
+          <button class="tab" data-tab="wardrobe" type="button">Armadio</button>
+        </nav>
+        <section class="panel" id="panel" aria-live="polite"></section>
+      </main>
+
+      <aside class="sidebar">
+        <section class="side-panel">
+          <div class="side-heading"><h3>La tua modella</h3><span id="modelRank">In strada</span></div>
+          <div class="avatar-wrap" id="avatarMain"></div>
+          <div class="model-name"><strong id="modelName">Mia Bellini</strong><span>✦ <b id="styleScore">0</b> stile</span></div>
+          <div id="statBars"></div>
+        </section>
+        <section class="side-panel">
+          <div class="side-heading"><h3>Il necessario</h3><span>Fine settimana</span></div>
+          <div class="inventory">
+            <div class="inventory-item"><span>Colazione</span><strong id="breakfastCount">Da fare</strong></div>
+            <div class="inventory-item"><span>Pranzo</span><strong id="lunchCount">Da fare</strong></div>
+            <div class="inventory-item"><span>Cena</span><strong id="dinnerCount">Da fare</strong></div>
+            <div class="inventory-item"><span>Acqua</span><strong id="waterCount">0 bottiglie</strong></div>
+            <div class="inventory-item"><span>Affitto / settimana</span><strong id="rentValue">€56</strong></div>
+            <div class="inventory-item"><span>Arretrati</span><strong id="debtValue">€0</strong></div>
+          </div>
+          <div class="closet-row"><span>Armadio di lusso</span><strong id="closetCount">0 capi</strong></div>
+          <div class="closet-row"><span>Portfolio</span><strong id="portfolioCount">0 scatti</strong></div>
+          <div class="closet-row"><span>Passerelle</span><strong id="runwayCount">0 / 15</strong></div>
+          <button class="cta subtle pay-rent hidden" id="payRentButton" type="button">Paga gli arretrati</button>
+        </section>
+        <section class="side-panel log-panel">
+          <div class="side-heading"><h3>Diario</h3><span>Ultime notizie</span></div>
+          <div class="log-list" id="logList"></div>
+        </section>
+      </aside>
+    </div>
+    <p class="footer-note">Un piccolo passo alla volta, un giorno alla volta. • Gioco narrativo offline</p>
+  </div>
+
+  <div class="overlay" id="setupOverlay">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+      <div class="eyebrow">Nuova vita • Giorno 1</div>
+      <h2 id="setupTitle">Prima, scegli il tuo look.</h2>
+      <p>Ti restano <strong>€32</strong> e il tuo primo outfit è semplice. La prima scelta di colore e lunghezza dei capelli è gratuita; sistemare le sopracciglia costa €4.</p>
+      <div class="setup-preview">
+        <div class="avatar-wrap" id="avatarSetup"></div>
+        <div class="setup-preview-copy"><strong>Il tuo primo ritratto</strong><p>Un look tutto tuo, senza filtri. I ritocchi estetici sono facoltativi e riducono i soldi per le prime necessità.</p></div>
+      </div>
+      <div class="setup-group">
+        <label class="setup-label" for="setupName"><span>Nome della tua modella</span></label>
+        <input class="name-input" id="setupName" type="text" maxlength="24" autocomplete="off" value="Mia Bellini" aria-label="Nome della tua modella">
+      </div>
+      <div class="setup-group">
+        <div class="setup-label"><span>Colore dei capelli</span><small>prima scelta gratuita</small></div>
+        <div class="choice-row" id="hairChoices"></div>
+      </div>
+      <div class="setup-group">
+        <div class="setup-label"><span>Lunghezza iniziale</span><small>prima scelta gratuita</small></div>
+        <div class="choice-row" id="hairLengthChoices"></div>
+      </div>
+      <div class="setup-group">
+        <div class="setup-label"><span>Sopracciglia</span><small>ritocco: €4</small></div>
+        <div class="choice-row" id="browChoices"></div>
+      </div>
+      <div class="setup-group">
+        <div class="setup-label"><span>Tonalità della pelle</span><small>gratuito</small></div>
+        <div class="choice-row" id="skinChoices"></div>
+      </div>
+      <div class="setup-footer">
+        <div class="setup-wallet">Il tuo portafoglio<strong id="setupCash">€32</strong></div>
+        <button class="cta" id="startButton" type="button">Entra in città →</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <section class="modal game-over" role="dialog" aria-modal="true" aria-labelledby="endTitle">
+      <div class="brand-mark" aria-hidden="true">N</div>
+      <div class="eyebrow" id="endEyebrow">Una storia da ricordare</div>
+      <h2 id="endTitle">La città ti ha notata.</h2>
+      <p id="endMessage"></p>
+      <button class="cta" id="playAgainButton" type="button">Ricomincia da capo</button>
+    </section>
+  </div>
+  <div class="overlay surprise-overlay hidden" id="surpriseOverlay">
+    <section class="modal surprise-modal" role="alertdialog" aria-modal="true" aria-labelledby="surpriseTitle" aria-describedby="surpriseMessage">
+      <div class="brand-mark" aria-hidden="true">✦</div>
+      <div class="eyebrow">Obiettivo finale completato</div>
+      <h2 id="surpriseTitle">C'è una sorpresa per te!</h2>
+      <p id="surpriseMessage">Sei diventata la miglior modella al mondo. Vai in fondo alla Boutique: l'atelier ha preparato un regalo speciale.</p>
+      <button class="cta" id="surpriseButton" type="button">Vai alla sorpresa in Boutique →</button>
+    </section>
+  </div>
+  <div class="overlay award-overlay hidden" id="awardOverlay">
+    <section class="modal award-modal" role="dialog" aria-modal="true" aria-labelledby="awardTitle" aria-describedby="awardMessage">
+      <div class="eyebrow">La notte delle stelle • Premio speciale</div>
+      <h2 id="awardTitle">Il mondo applaude te.</h2>
+      <div class="award-scene" role="img" aria-label="La tua modella in abito dorato ritira il premio sul palco">
+        <div class="award-curtain" aria-hidden="true"></div>
+        <div class="award-confetti" aria-hidden="true"></div>
+        <div class="avatar-wrap award-avatar" id="awardAvatar"></div>
+        <div class="award-trophy" aria-hidden="true">🏆</div>
+        <div class="award-podium" aria-hidden="true"></div>
+      </div>
+      <div class="eyebrow">Premio alla carriera</div>
+      <h2 id="awardTitleRank">La miglior modella al mondo</h2>
+      <p id="awardMessage">Con il tuo abito dorato da principessa, sali sul palco e ritiri il premio più importante del mondo della moda.</p>
+      <button class="cta" id="awardContinue" type="button">Continua verso il gran finale →</button>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    (() => {
+      const SAVE_KEY = "neon-runway-save-v1";
+      const RENT = 56;
+      const $ = (selector) => document.querySelector(selector);
+      const hairOptions = [
+        { name: "Castano", color: "#33252b" },
+        { name: "Nero", color: "#19181d" },
+        { name: "Rame", color: "#a9563e" },
+        { name: "Biondo", color: "#c5a06a" }
+      ];
+      const hairLengths = ["corti", "medi", "lunghi"];
+      const hairLengthNames = ["corta", "media", "lunga"];
+      const haircutNames = ["corto", "medio", "lungo"];
+      const breakfastOptions = [
+        { id: "coffee", name: "Cappuccino o caffè", desc: "Una tazza calda per cominciare la giornata.", price: 2, hunger: 14 },
+        { id: "croissant", name: "Cornetto", desc: "Una colazione semplice e veloce.", price: 2, hunger: 14 },
+        { id: "combo", name: "Cappuccino e cornetto", desc: "La colazione completa: puoi anche scegliere i due elementi separati.", price: 4, hunger: 30 }
+      ];
+      const lunchOptions = [
+        { id: "meat", name: "Carne", price: 5, hunger: 25 },
+        { id: "fish", name: "Pesce", price: 5, hunger: 25 },
+        { id: "pasta", name: "Pasta", price: 5, hunger: 25 },
+        { id: "vegetables", name: "Verdure", price: 5, hunger: 20 },
+        { id: "meat-pasta", name: "Carne + pasta", price: 9, hunger: 36 },
+        { id: "fish-vegetables", name: "Pesce + verdure", price: 9, hunger: 34 },
+        { id: "meat-fish", name: "Carne + pesce", price: 9, hunger: 40 },
+        { id: "pasta-vegetables", name: "Pasta + verdure", price: 9, hunger: 34 }
+      ];
+      const dinnerOptions = [
+        { id: "margherita", name: "Pizza margherita", price: 6, hunger: 30 },
+        { id: "four-cheese", name: "Pizza 4 formaggi", price: 8, hunger: 36 },
+        { id: "american", name: "Pizza americana", price: 8, hunger: 38 },
+        { id: "sushi", name: "Sushi", price: 30, hunger: 42 },
+        { id: "caviar", name: "Caviale e pesce crudo", price: 50, hunger: 46 },
+        { id: "simple", name: "Piatto semplice", desc: "Carne, pesce, pasta oppure verdure.", price: 5, hunger: 25 }
+      ];
+      const DAY_START = 6 * 60;
+      const NIGHT_START = 20 * 60;
+      const skinOptions = [
+        { name: "Chiara", color: "#edc2a5" },
+        { name: "Calda", color: "#d8a88f" },
+        { name: "Ambrata", color: "#bc8266" },
+        { name: "Oliva", color: "#a9765c" }
+      ];
+      const browOptions = [
+        { name: "Naturali", color: "#33252b" },
+        { name: "Morbide", color: "#795047" },
+        { name: "Scure", color: "#20191b" }
+      ];
+      const jobs = [
+        { id: "clean", icon: "⌂", name: "Pulizie in villa", desc: "Una casa sulle colline, tre ore di lavoro e una mancia se lasci tutto splendente.", pay: 26, energy: 24 },
+        { id: "hair", icon: "✂", name: "Aiuto in salone", desc: "Lava, riordina e prepara le postazioni: il salone è sempre in cerca di una mano.", pay: 29, energy: 27 },
+        { id: "makeup", icon: "✦", name: "Assistente make-up", desc: "Prepara i pennelli e impara qualche trucco dietro le quinte di un set.", pay: 34, energy: 31 },
+        { id: "beauty", icon: "❋", name: "Aiuto estetista", desc: "Accogli le clienti e prepara i trattamenti in un piccolo centro di bellezza.", pay: 32, energy: 29 }
+      ];
+      const nightJob = { pay: 110 };
+      const basics = [
+        { id: "tee", icon: "◒", category: "top", categoryName: "Top", name: "T-shirt pulita", desc: "Un capo semplice, ma fresco e pronto per un nuovo giorno.", price: 18 },
+        { id: "jeans", icon: "▥", category: "bottom", categoryName: "Pantaloni", name: "Jeans resistenti", desc: "Comodi per i turni lunghi. La moda può aspettare.", price: 26 }
+      ];
+      const medkits = [
+        { id: "small", name: "Medikit · +15 salute", desc: "Un kit compatto per curare ferite leggere.", price: 20, heal: 15 },
+        { id: "medium", name: "Medikit · +30 salute", desc: "Una cura più completa per rimetterti in piedi.", price: 37, heal: 30 },
+        { id: "large", name: "Medikit · +50 salute", desc: "Un kit professionale per una ripresa importante.", price: 60, heal: 50 },
+        { id: "full", name: "Medikit · cura completa", desc: "Ripristina tutta la salute, senza superare il 100%.", price: 110, heal: 100 }
+      ];
+      const luxuryColors = [
+        { name: "Avorio", color: "#e5d7c2" },
+        { name: "Nero", color: "#29272d" },
+        { name: "Rosa", color: "#c77b91" },
+        { name: "Rosso", color: "#a83e4f" },
+        { name: "Blu notte", color: "#38486e" },
+        { name: "Verde", color: "#486b58" },
+        { name: "Oro regale", color: "#d3aa50" }
+      ];
+      const luxury = [
+        { id: "blouse-1000", category: "top", categoryName: "Top", name: "Blusa Atelier", desc: "Seta fluida, rifinita a mano.", price: 1000, style: 40 },
+        { id: "silk-top-2000", category: "top", categoryName: "Top", name: "Top in seta couture", desc: "Un taglio scultoreo da prima fila.", price: 2000, style: 60 },
+        { id: "couture-top-3000", category: "top", categoryName: "Top", name: "Bustier Haute Couture", desc: "Un pezzo da passerella, realizzato su misura.", price: 3000, style: 80 },
+        { id: "trousers-1000", category: "bottom", categoryName: "Pantaloni", name: "Pantalone sartoriale", desc: "Linea impeccabile e tessuto italiano.", price: 1000, style: 40 },
+        { id: "tailored-pants-2000", category: "bottom", categoryName: "Pantaloni", name: "Pantalone Palazzo", desc: "Caduta ampia in lana e seta.", price: 2000, style: 60 },
+        { id: "runway-pants-3000", category: "bottom", categoryName: "Pantaloni", name: "Pantalone da passerella", desc: "Un design d'archivio in edizione limitata.", price: 3000, style: 80 },
+        { id: "cocktail-dress-1000", category: "dress", categoryName: "Abiti", name: "Abito cocktail", desc: "Una silhouette luminosa per la sera.", price: 1000, style: 40 },
+        { id: "evening-dress-2000", category: "dress", categoryName: "Abiti", name: "Abito lungo in seta", desc: "Drappeggi e dettagli cuciti a mano.", price: 2000, style: 60 },
+        { id: "couture-gown-3000", category: "dress", categoryName: "Abiti", name: "Abito Haute Couture", desc: "Un abito da sogno, unico e numerato.", price: 3000, style: 80 },
+        { id: "blazer-1000", category: "outerwear", categoryName: "Capispalla", name: "Blazer firmato", desc: "Il classico intramontabile del guardaroba.", price: 1000, style: 40 },
+        { id: "coat-2000", category: "outerwear", categoryName: "Capispalla", name: "Cappotto in cashmere", desc: "Calore leggero e taglio architettonico.", price: 2000, style: 60 },
+        { id: "cape-3000", category: "outerwear", categoryName: "Capispalla", name: "Mantella da collezione", desc: "Un capo scenografico in tiratura limitata.", price: 3000, style: 80 },
+        { id: "heels-1000", category: "shoes", categoryName: "Scarpe", name: "Décolleté iconiche", desc: "Pelle morbida e tacco da red carpet.", price: 1000, style: 40 },
+        { id: "boots-2000", category: "shoes", categoryName: "Scarpe", name: "Stivali couture", desc: "Realizzati a mano per lasciare il segno.", price: 2000, style: 60 },
+        { id: "runway-heels-3000", category: "shoes", categoryName: "Scarpe", name: "Sandali da passerella", desc: "Un modello esclusivo da atelier parigino.", price: 3000, style: 80 },
+        { id: "clutch-1000", category: "bag", categoryName: "Borse", name: "Pochette da sera", desc: "Compatta, luminosa, perfetta per il set.", price: 1000, style: 40 },
+        { id: "handbag-2000", category: "bag", categoryName: "Borse", name: "Borsa in pelle", desc: "Pelle italiana e minuteria preziosa.", price: 2000, style: 60 },
+        { id: "runway-bag-3000", category: "bag", categoryName: "Borse", name: "Borsa da passerella", desc: "Un accessorio d'archivio da collezione.", price: 3000, style: 80 },
+        { id: "earrings-1000", category: "accessory", categoryName: "Accessori", name: "Orecchini luminosi", desc: "Un dettaglio brillante per ogni ritratto.", price: 1000, style: 40 },
+        { id: "necklace-1000", category: "necklace", categoryName: "Collane", name: "Collana a catena", desc: "Una catena fine da indossare ogni giorno.", price: 1000, style: 40 },
+        { id: "necklace-2000", category: "necklace", categoryName: "Collane", name: "Collana scultorea", desc: "Design contemporaneo, finitura preziosa.", price: 2000, style: 60 },
+        { id: "diamond-set-3000", category: "accessory", categoryName: "Accessori", name: "Parure da collezione", desc: "Un set esclusivo che cattura ogni luce.", price: 3000, style: 80 },
+        { id: "necklace-3000", category: "necklace", categoryName: "Collane", name: "Collana Haute Joaillerie", desc: "Una collana importante con pendente da sera.", price: 3000, style: 80 },
+        { id: "mini-a-line-1300", category: "dress", categoryName: "Abiti", name: "Abito corto a trapezio", desc: "Gonna corta svasata e corpetto strutturato.", price: 1300, style: 44 },
+        { id: "slip-mini-1700", category: "dress", categoryName: "Abiti", name: "Mini abito sottoveste", desc: "Raso lucido e spalline sottili.", price: 1700, style: 50 },
+        { id: "wrap-midi-2100", category: "dress", categoryName: "Abiti", name: "Abito midi a portafoglio", desc: "Lunghezza al polpaccio con cintura annodata.", price: 2100, style: 61 },
+        { id: "column-dress-2400", category: "dress", categoryName: "Abiti", name: "Abito colonna lungo", desc: "Una linea lunga e pulita fino alla caviglia.", price: 2400, style: 67 },
+        { id: "slit-gown-2800", category: "dress", categoryName: "Abiti", name: "Abito da sera con spacco", desc: "Gonna lunga fluida con spacco laterale.", price: 2800, style: 74 },
+        { id: "ball-gown-3000", category: "dress", categoryName: "Abiti", name: "Abito da gran gala", desc: "Corpetto aderente e ampia gonna da cerimonia.", price: 3000, style: 82 },
+        { id: "shirt-1600", category: "top", categoryName: "Top", name: "Camicia in popeline", desc: "Colletto oversize e bottoni gioiello.", price: 1600, style: 46 },
+        { id: "knit-1800", category: "top", categoryName: "Top", name: "Maglia in cashmere", desc: "Maglia morbida con maniche a sbuffo.", price: 1800, style: 48 },
+        { id: "asym-top-2400", category: "top", categoryName: "Top", name: "Top monospalla", desc: "Un taglio asimmetrico in raso lucente.", price: 2400, style: 66 },
+        { id: "pencil-skirt-1200", category: "skirt", categoryName: "Gonne", name: "Gonna a matita", desc: "Linea essenziale con spacco posteriore.", price: 1200, style: 43 },
+        { id: "pleated-skirt-2100", category: "skirt", categoryName: "Gonne", name: "Gonna plissé", desc: "Pieghe leggere che si muovono a ogni passo.", price: 2100, style: 62 },
+        { id: "shorts-1400", category: "bottom", categoryName: "Pantaloni", name: "Shorts sartoriali", desc: "Bermuda eleganti con vita alta.", price: 1400, style: 45 },
+        { id: "jumpsuit-1800", category: "jumpsuit", categoryName: "Abiti", name: "Tuta intera elegante", desc: "Una linea slanciata dal giorno alla sera.", price: 1800, style: 52 },
+        { id: "mini-dress-1500", category: "dress", categoryName: "Abiti", name: "Abito mini drappeggiato", desc: "Un abito corto con nodo laterale.", price: 1500, style: 47 },
+        { id: "trench-1600", category: "outerwear", categoryName: "Capispalla", name: "Trench classico", desc: "Doppio petto e cintura in vita.", price: 1600, style: 48 },
+        { id: "leather-jacket-2400", category: "outerwear", categoryName: "Capispalla", name: "Giacca in pelle", desc: "Un taglio deciso con zip metalliche.", price: 2400, style: 67 },
+        { id: "fur-coat-2800", category: "outerwear", categoryName: "Capispalla", name: "Cappotto teddy couture", desc: "Un volume avvolgente da collezione.", price: 2800, style: 72 },
+        { id: "sneakers-1100", category: "shoes", categoryName: "Scarpe", name: "Sneakers couture", desc: "Sneakers in pelle con dettagli ricamati.", price: 1100, style: 42 },
+        { id: "loafers-1300", category: "shoes", categoryName: "Scarpe", name: "Mocassini in vernice", desc: "Un classico lucido con fibbia dorata.", price: 1300, style: 44 },
+        { id: "ankle-boots-1800", category: "shoes", categoryName: "Scarpe", name: "Stivaletti con tacco", desc: "Tacco slanciato e punta affusolata.", price: 1800, style: 53 },
+        { id: "platform-heels-2300", category: "shoes", categoryName: "Scarpe", name: "Décolleté plateau", desc: "Tacchi alti e plateau per la passerella.", price: 2300, style: 64 },
+        { id: "tote-1500", category: "bag", categoryName: "Borse", name: "Shopper in pelle", desc: "Capiente, elegante e rifinita a mano.", price: 1500, style: 46 },
+        { id: "crossbody-1700", category: "bag", categoryName: "Borse", name: "Tracolla mini", desc: "Una piccola borsa con catena luminosa.", price: 1700, style: 49 },
+        { id: "backpack-1900", category: "bag", categoryName: "Borse", name: "Zaino di design", desc: "Praticità urbana in pelle martellata.", price: 1900, style: 52 },
+        { id: "belt-1000", category: "accessory", categoryName: "Accessori", name: "Cintura gioiello", desc: "Una fibbia scultorea per definire il look.", price: 1000, style: 40 },
+        { id: "bracelet-1200", category: "accessory", categoryName: "Accessori", name: "Bracciale rigido", desc: "Un cerchio dorato dal design essenziale.", price: 1200, style: 43 },
+        { id: "cocktail-ring-1500", category: "accessory", categoryName: "Accessori", name: "Anello cocktail", desc: "Una pietra colorata montata a mano.", price: 1500, style: 46 },
+        { id: "silk-scarf-1100", category: "accessory", categoryName: "Accessori", name: "Foulard in seta", desc: "Stampa artistica e orli arrotolati a mano.", price: 1100, style: 41 },
+        { id: "wide-hat-1200", category: "accessory", categoryName: "Accessori", name: "Cappello a tesa larga", desc: "Un tocco cinematografico per il tuo look.", price: 1200, style: 43 },
+        { id: "pearl-necklace-1500", category: "necklace", categoryName: "Collane", name: "Collana di perle", desc: "Perle luminose in una fila classica.", price: 1500, style: 46 },
+        { id: "long-necklace-2500", category: "necklace", categoryName: "Collane", name: "Collana lunga con ciondolo", desc: "Una catena lunga con pendente geometrico.", price: 2500, style: 68 },
+        { id: "sunglasses-cat-eye", category: "sunglasses", categoryName: "Occhiali da sole", name: "Occhiali cat-eye", desc: "Montatura scolpita dal fascino rétro.", price: 450, style: 18 },
+        { id: "sunglasses-aviator", category: "sunglasses", categoryName: "Occhiali da sole", name: "Occhiali aviator", desc: "Lenti sfumate e profilo metallico.", price: 620, style: 20 },
+        { id: "sunglasses-oversized", category: "sunglasses", categoryName: "Occhiali da sole", name: "Occhiali oversize", desc: "Lenti grandi per un ingresso da diva.", price: 780, style: 22 },
+        { id: "princess-gown", category: "dress", categoryName: "Abiti", name: "Abito dorato da principessa", desc: "Un abito lungo color oro, dono dell'atelier per il gran finale.", price: 0, style: 0, finale: true }
+      ];
+      const atelierItems = luxury.filter((item) => !item.finale);
+      const princessGownId = "princess-gown";
+
+      const freshState = () => ({
+        schemaVersion: 6,
+        started: false, day: 1, cash: 32, energy: 100, hunger: 72, water: 72, health: 100,
+        bottles: 1, rentDebt: 0, missedRents: 0, wardrobe: [], basics: [],
+        outfit: { mode: "separates", shoes: "", bottom: "", top: "", dress: "", accessory: "" }, wornOutfit: null,
+        portfolio: 0, hair: 0, hairLength: 1, hairGrowthDays: 0, brow: 0, skin: 1,
+        runwayCount: 0, lastRunwayDay: -7, expertUnlocked: false, finaleUnlocked: false, finalShowComplete: false,
+        surpriseNoticePending: false, awardCelebrationPending: false,
+        timeMinutes: DAY_START, breaksUsed: 0, meals: { breakfast: false, lunch: false, dinner: false },
+        breakfastOrder: { coffee: false, croissant: false },
+        modelName: "Mia Bellini", luxuryColors: {}, lastNightShiftDay: -7,
+        style: 0, tab: "work", log: [],
+        ended: false, noticed: false
+      });
+      let state = freshState();
+      let toastTimer;
+
+      function save() {
+        try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+        catch (error) { console.warn("Salvataggio non disponibile:", error); }
+      }
+
+      function load() {
+        try {
+          const raw = localStorage.getItem(SAVE_KEY);
+          if (!raw) return false;
+          const saved = JSON.parse(raw);
+          if (!saved || typeof saved !== "object" || !Number.isFinite(saved.cash) || !Number.isFinite(saved.day)) return false;
+          const legacySave = saved.schemaVersion === undefined;
+          const previousSave = legacySave || (Number.isInteger(saved.schemaVersion) && saved.schemaVersion < 6);
+          const previousCareerSave = legacySave || (Number.isInteger(saved.schemaVersion) && saved.schemaVersion < 5);
+          state = { ...freshState(), ...saved };
+          if (typeof state.modelName !== "string") state.modelName = "Mia Bellini";
+          if (!state.luxuryColors || typeof state.luxuryColors !== "object") state.luxuryColors = {};
+          if (legacySave && state.tab === "wardrobe") state.tab = "atelier";
+          state.outfit = { ...freshState().outfit, ...(state.outfit && typeof state.outfit === "object" ? state.outfit : {}) };
+          if (state.outfit.mode !== "dress" && state.outfit.mode !== "separates") state.outfit.mode = "separates";
+          state.runwayCount = Number.isInteger(state.runwayCount) && state.runwayCount >= 0 ? state.runwayCount : 0;
+          state.lastRunwayDay = Number.isInteger(state.lastRunwayDay) ? state.lastRunwayDay : -7;
+          state.expertUnlocked = Boolean(state.expertUnlocked);
+          state.finaleUnlocked = Boolean(state.finaleUnlocked);
+          state.finalShowComplete = Boolean(state.finalShowComplete);
+          state.surpriseNoticePending = Boolean(state.surpriseNoticePending);
+          state.awardCelebrationPending = Boolean(state.awardCelebrationPending);
+          if (previousCareerSave && state.ended && state.noticed) state.ended = false;
+          if (previousSave && state.finaleUnlocked && !state.wardrobe.includes(princessGownId) && !state.finalShowComplete) {
+            state.surpriseNoticePending = true;
+          }
+          state.schemaVersion = 6;
+          return true;
+        } catch (error) {
+          console.warn("Impossibile caricare la partita salvata:", error);
+          return false;
+        }
+      }
+
+      function money(amount) { return `€${Math.max(0, Math.round(amount)).toLocaleString("it-IT")}`; }
+      function clamp(value) { return Math.max(0, Math.min(100, value)); }
+      function clockText(minutes) {
+        return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+      }
+      function canSpendTime(minutes) {
+        return state.timeMinutes < NIGHT_START && state.timeMinutes + minutes <= NIGHT_START;
+      }
+      function isNight() { return state.timeMinutes >= NIGHT_START; }
+      function findClothingItem(id) {
+        return luxury.find((item) => item.id === id) || basics.find((item) => item.id === id) || null;
+      }
+
+      function allAtelierItemsOwned() {
+        return atelierItems.every((item) => state.wardrobe.includes(item.id));
+      }
+
+      function updateCareerMilestones() {
+        if (state.ended) return;
+        if (!state.noticed && state.cash >= 500 && wardrobeValue() >= 10000 && state.portfolio >= 2) {
+          state.noticed = true;
+          log("Un'agenzia ti ha notata: comincia la tua carriera in passerella.");
+          showToast("Un'agenzia ti ha scelta! La prima passerella ti aspetta a fine settimana.");
+        }
+        if (state.noticed && !state.expertUnlocked && state.runwayCount >= 7 && wardrobeValue() >= 30000) {
+          state.expertUnlocked = true;
+          log("Sette passerelle e €30.000 di capi: ora sei una modella esperta.");
+          showToast("Obiettivo 2/3 completato: sei una modella esperta.");
+        }
+        if (state.expertUnlocked && !state.finaleUnlocked && state.runwayCount >= 15 && allAtelierItemsOwned()) {
+          state.finaleUnlocked = true;
+          state.surpriseNoticePending = true;
+          log("Hai conquistato 15 passerelle e ogni modello dell'atelier in un colore a scelta: si è sbloccato l'abito dorato gratuito.");
+        }
+      }
+
+      function outfitOptions(slot) {
+        const owned = luxury.filter((item) => state.wardrobe.includes(item.id));
+        if (slot === "shoes") return owned.filter((item) => item.category === "shoes");
+        if (slot === "bottom") return basics.filter((item) => state.basics.includes(item.id) && item.category === "bottom")
+          .concat(owned.filter((item) => item.category === "bottom" || item.category === "skirt"));
+        if (slot === "top") return basics.filter((item) => state.basics.includes(item.id) && item.category === "top")
+          .concat(owned.filter((item) => item.category === "top"));
+        if (slot === "dress") return owned.filter((item) => item.category === "dress" || item.category === "jumpsuit");
+        if (slot === "accessory") return owned.filter((item) => ["accessory", "necklace", "sunglasses", "bag"].includes(item.category));
+        return [];
+      }
+
+      function outfitIsComplete(outfit = state.outfit) {
+        if (!outfit || !outfitOptions("shoes").some((item) => item.id === outfit.shoes)) return false;
+        if (outfit.mode === "dress") return outfitOptions("dress").some((item) => item.id === outfit.dress);
+        return outfit.mode === "separates"
+          && outfitOptions("bottom").some((item) => item.id === outfit.bottom)
+          && outfitOptions("top").some((item) => item.id === outfit.top);
+      }
+
+      function outfitSelectMarkup(slot, label) {
+        const selected = state.outfit[slot] || "";
+        const items = outfitOptions(slot);
+        return `<div class="outfit-field"><label for="outfit-${slot}">${label}</label><select id="outfit-${slot}" data-outfit-slot="${slot}">
+          <option value="">${items.length ? "Scegli dall'armadio…" : "Nessun capo disponibile"}</option>
+          ${items.map((item) => {
+            const colorIndex = item.finale ? luxuryColors.length - 1
+              : Number.isInteger(state.luxuryColors[item.id]) ? state.luxuryColors[item.id] : 4;
+            const colorName = luxuryColors[Math.max(0, Math.min(luxuryColors.length - 1, colorIndex))].name;
+            return `<option value="${item.id}" ${selected === item.id ? "selected" : ""}>${item.name} · ${colorName}</option>`;
+          }).join("")}
+        </select></div>`;
+      }
+
+      function appearanceStyle() {
+        const hair = hairOptions[state.hair] || hairOptions[0];
+        const brow = browOptions[state.brow] || browOptions[0];
+        const skin = skinOptions[state.skin] || skinOptions[1];
+        const worn = state.wornOutfit;
+        const garment = worn && findClothingItem(worn.mode === "dress" ? worn.dress : worn.top);
+        const garmentColorIndex = garment && garment.finale ? luxuryColors.length - 1
+          : garment && Number.isInteger(state.luxuryColors[garment.id])
+            ? Math.max(0, Math.min(luxuryColors.length - 1, state.luxuryColors[garment.id]))
+            : 4;
+        const outfit = garment ? luxuryColors[garmentColorIndex].color : state.basics.includes("tee") ? "#87909b" : "#b9aaa5";
+        return `--hair:${hair.color};--brow:${brow.color};--skin:${skin.color};--outfit:${outfit}`;
+      }
+
+      function avatarMarkup() {
+        const hairBackPaths = [
+          "M37 73c-3-31 13-54 35-54 24 0 39 22 34 57l-4 17-12 9-2-26c-9 4-20 4-31 0l-2 27-14-10-4-20z",
+          "M37 73c-3-31 13-54 35-54 24 0 39 22 34 57l-4 32-12 16-2-41c-9 4-20 4-31 0l-2 42-14-17-4-35z",
+          "M37 73c-3-31 13-54 35-54 24 0 39 22 34 57l-4 59-12 18-2-68c-9 4-20 4-31 0l-2 69-14-19-4-62z"
+        ];
+        const hairBack = hairBackPaths[state.hairLength] || hairBackPaths[1];
+        const wornGarment = state.wornOutfit && findClothingItem(state.wornOutfit.mode === "dress" ? state.wornOutfit.dress : state.wornOutfit.top);
+        const outfitPath = wornGarment && (wornGarment.category === "dress" || wornGarment.category === "jumpsuit")
+          ? "M55 115h30c15 6 20 17 23 30l15 38H17l15-38c3-13 8-24 23-30z"
+          : "M25 168c2-29 12-45 30-50h30c19 6 28 22 30 50H25z";
+        return `<svg class="avatar-svg" style="${appearanceStyle()}" viewBox="0 0 140 170" role="img" aria-label="Ritratto della tua modella">
+          <ellipse cx="70" cy="164" rx="45" ry="7" fill="#0b0c0f" opacity=".45"/>
+          <path class="avatar-top" d="${outfitPath}"/>
+          <path class="avatar-face" d="M51 82h38v38c-4 10-11 15-19 15s-15-5-19-15V82z"/>
+          <path class="avatar-hair" d="${hairBack}"/>
+          <ellipse class="avatar-face" cx="70" cy="70" rx="25" ry="32"/>
+          <path class="avatar-hair" d="M45 68c-1-30 11-45 28-45 18 0 29 15 28 38-9-5-15-13-19-24-9 13-20 20-37 22z"/>
+          <path class="avatar-brow" d="M53 67c4-3 9-3 13-1l-1 3c-4-1-8-1-12 1zM75 66c4-2 9-2 13 1l-1 3c-4-2-8-2-12 0z"/>
+          <path class="avatar-details" d="M55 75h7m16 0h7m-12 3-2 11 4 1m-9 8c4 3 10 3 14 0"/>
+          <path d="M56 117c8 7 20 7 28 0l8 6c-5 12-14 18-22 18-9 0-17-6-22-18z" fill="#d29591" opacity=".5"/>
+        </svg>`;
+      }
+
+      function renderAvatar() {
+        $("#avatarMain").innerHTML = avatarMarkup();
+        $("#avatarSetup").innerHTML = avatarMarkup();
+      }
+
+      function setupChoices(containerId, options, selectedIndex, onSelect, colorKey) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = options.map((option, index) =>
+          `<button type="button" class="choice ${index === selectedIndex ? "selected" : ""}" data-choice="${index}">
+            ${colorKey ? `<span class="swatch" style="--swatch:${option[colorKey]}"></span>` : ""}${option.name}
+          </button>`
+        ).join("");
+        container.querySelectorAll(".choice").forEach((button) => {
+          button.addEventListener("click", () => {
+            const index = Number(button.dataset.choice);
+            if (onSelect(index) === false) return;
+            container.querySelectorAll(".choice").forEach((choice) => {
+              choice.classList.toggle("selected", Number(choice.dataset.choice) === index);
+            });
+            $("#setupCash").textContent = money(state.cash);
+            renderAvatar();
+          });
+        });
+      }
+
+      function setupScreen() {
+        $("#setupName").value = state.modelName || "";
+        setupChoices("hairChoices", hairOptions, state.hair, (index) => {
+          state.hair = index;
+        }, "color");
+        setupChoices("hairLengthChoices", hairLengths.map((name) => ({ name: name[0].toUpperCase() + name.slice(1) })), state.hairLength, (index) => {
+          state.hairLength = index;
+        });
+        setupChoices("browChoices", browOptions, state.brow, (index) => {
+          if (index !== state.brow && state.cash < 4) {
+            showToast("Non hai abbastanza per sistemare le sopracciglia.");
+            return false;
+          }
+          if (index !== state.brow) state.cash -= 4;
+          state.brow = index;
+        }, "color");
+        setupChoices("skinChoices", skinOptions, state.skin, (index) => {
+          state.skin = index;
+        }, "color");
+        $("#setupCash").textContent = money(state.cash);
+        $("#startButton").disabled = state.cash < 0 || !state.modelName.trim();
+        renderAvatar();
+      }
+
+      function statColor(value) { return value < 25 ? "var(--red)" : value < 50 ? "var(--gold)" : "var(--green)"; }
+      function renderStats() {
+        const stats = [
+          ["Energia", state.energy, "✧"],
+          ["Fame", state.hunger, "♡"],
+          ["Sete", state.water, "◌"],
+          ["Salute", state.health, "✚"]
+        ];
+        $("#statBars").innerHTML = stats.map(([name, value, icon]) =>
+          `<div class="stat"><div class="stat-top"><span>${icon} &nbsp;${name}</span><span>${Math.round(value)}%</span></div>
+          <div class="meter"><span style="width:${clamp(value)}%;--bar:${statColor(value)}"></span></div></div>`
+        ).join("");
+      }
+
+      function log(message) {
+        state.log.unshift({ day: state.day, message });
+        state.log = state.log.slice(0, 5);
+      }
+
+      function renderLog() {
+        $("#logList").innerHTML = state.log.length
+          ? state.log.map((entry) => `<div class="log-entry"><span class="log-dot"></span><span><b>G${entry.day}</b> · ${entry.message}</span></div>`).join("")
+          : `<div class="log-entry"><span class="log-dot"></span><span>La tua storia comincia oggi. La città è tutta da scoprire.</span></div>`;
+      }
+
+      function wardrobeValue() {
+        return state.wardrobe.reduce((total, id) => {
+          const item = luxury.find((entry) => entry.id === id);
+          return total + (item ? item.price : 0);
+        }, 0);
+      }
+
+      function renderHud() {
+        $("#dayCount").textContent = state.day;
+        $("#timeCount").textContent = clockText(state.timeMinutes);
+        $("#cashTop").textContent = Math.max(0, Math.round(state.cash)).toLocaleString("it-IT");
+        for (const [id, key] of [["breakfastCount", "breakfast"], ["lunchCount", "lunch"], ["dinnerCount", "dinner"]]) {
+          const mealStatus = document.getElementById(id);
+          mealStatus.textContent = state.meals[key] ? "Fatto" : "Da fare";
+          mealStatus.className = state.meals[key] ? "good" : "warn";
+        }
+        $("#waterCount").textContent = `${state.bottles} ${state.bottles === 1 ? "bottiglia" : "bottiglie"}`;
+        $("#rentValue").textContent = money(RENT);
+        $("#debtValue").textContent = money(state.rentDebt);
+        $("#debtValue").className = state.rentDebt > 0 ? "bad" : "good";
+        $("#closetCount").textContent = `${state.wardrobe.length} ${state.wardrobe.length === 1 ? "capo" : "capi"} · ${money(wardrobeValue())}`;
+        $("#portfolioCount").textContent = `${state.portfolio} ${state.portfolio === 1 ? "scatto" : "scatti"}`;
+        $("#runwayCount").textContent = `${state.runwayCount} / 15`;
+        $("#styleScore").textContent = state.style;
+        $("#modelName").textContent = state.modelName || "Mia Bellini";
+        $("#modelRank").textContent = state.finaleUnlocked ? "Miglior modella al mondo"
+          : state.expertUnlocked ? "Esperta"
+          : state.noticed ? "Principiante"
+          : state.wardrobe.length >= 2 ? "In ascesa" : "In strada";
+        $("#payRentButton").classList.toggle("hidden", state.rentDebt <= 0);
+        let progress;
+        if (!state.noticed) {
+          progress = Math.min(1, (Math.min(1, state.cash / 500) + Math.min(1, wardrobeValue() / 10000) + Math.min(1, state.portfolio / 2)) / 3);
+          $("#objectiveText").textContent = `1/3 · Agenzia: capi ${money(wardrobeValue())}/€10.000 · cassa ${money(state.cash)}/€500 · scatti ${state.portfolio}/2`;
+        } else if (!state.expertUnlocked) {
+          progress = (Math.min(1, state.runwayCount / 7) + Math.min(1, wardrobeValue() / 30000)) / 2;
+          $("#objectiveText").textContent = `2/3 · Passerelle ${state.runwayCount}/7 · capi ${money(wardrobeValue())}/€30.000`;
+        } else if (!state.finaleUnlocked) {
+          progress = (Math.min(1, state.runwayCount / 15) + Math.min(1, state.wardrobe.filter((id) => atelierItems.some((item) => item.id === id)).length / atelierItems.length)) / 2;
+          $("#objectiveText").textContent = `3/3 · Sfilate ${state.runwayCount}/15 · modelli ${state.wardrobe.filter((id) => atelierItems.some((item) => item.id === id)).length}/${atelierItems.length}`;
+        } else {
+          progress = 1;
+          $("#objectiveText").textContent = state.finalShowComplete ? "Il mondo applaude la tua sfilata!" : "Gran finale · indossa l'abito dorato";
+        }
+        $("#objectiveBar").style.width = `${progress * 100}%`;
+        renderStats(); renderLog(); renderAvatar();
+      }
+
+      function showToast(message) {
+        const toast = $("#toast");
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 2800);
+      }
+
+      function finishDay(energyRecovery = 0) {
+        if (!state.meals.breakfast) {
+          state.health = clamp(state.health - 2);
+          log("Hai saltato la colazione: −2 salute.");
+        }
+        if (!state.meals.lunch) {
+          state.health = clamp(state.health - 10);
+          log("Hai saltato il pranzo: −10 salute.");
+        }
+        state.hunger = clamp(state.hunger - 8);
+        state.water = clamp(state.water - 10);
+        if (state.hunger === 0) state.health = clamp(state.health - 13);
+        if (state.water === 0) state.health = clamp(state.health - 18);
+        state.hairGrowthDays++;
+        if (state.hairGrowthDays >= 7) {
+          state.hairGrowthDays = 0;
+          if (state.hairLength < hairLengths.length - 1) {
+            state.hairLength++;
+            log(`I capelli sono cresciuti: ora sono ${hairLengths[state.hairLength]}.`);
+          }
+        }
+        if (state.day % 7 === 0) {
+          const bill = RENT + state.rentDebt;
+          if (state.cash >= bill) {
+            state.cash -= bill;
+            state.rentDebt = 0;
+            state.missedRents = 0;
+            log(`Affitto pagato: ${money(bill)}. Un tetto sopra la testa.`);
+          } else {
+            const paid = state.cash;
+            state.cash = 0;
+            state.rentDebt += RENT;
+            state.missedRents++;
+            log(`Affitto non coperto: hai pagato ${money(paid)} e restano ${money(state.rentDebt)} di arretrati.`);
+          }
+        }
+        state.day++;
+        state.timeMinutes = DAY_START;
+        if (energyRecovery > 0) state.energy = clamp(state.energy + energyRecovery);
+        state.breaksUsed = 0;
+        state.meals = { breakfast: false, lunch: false, dinner: false };
+        state.breakfastOrder = { coffee: false, croissant: false };
+        if (state.health <= 0) endGame(false, "La stanchezza e le necessità rimandate hanno avuto la meglio. Prenditi cura di te, poi riprova: la passerella può aspettare.");
+        if (state.missedRents >= 2) endGame(false, "Due affitti non pagati: hai perso la stanza. Con un piccolo fondo di emergenza, la prossima volta potrai ripartire più forte.");
+        updateCareerMilestones();
+      }
+
+      function forcedRestDays() { return state.health < 25 ? 3 : 2; }
+
+      function forcedRestMealCost() {
+        return (state.meals.breakfast ? 0 : 2) + (state.meals.lunch ? 0 : 5) + (state.meals.dinner ? 0 : 5);
+      }
+
+      function forcedRestCost() {
+        const days = forcedRestDays();
+        let cost = forcedRestMealCost() + (days - 1) * 12;
+        let debt = state.rentDebt;
+        for (let offset = 0; offset < days; offset++) {
+          if ((state.day + offset) % 7 === 0) {
+            cost += RENT + debt;
+            debt = 0;
+          }
+        }
+        return cost;
+      }
+
+      function minimumMedkitCostToReachWorkHealth() {
+        const needed = Math.max(0, Math.ceil(35 - state.health));
+        if (!needed) return 0;
+        const cost = Array(needed + 1).fill(Infinity);
+        cost[0] = 0;
+        for (let healed = 0; healed < needed; healed++) {
+          if (!Number.isFinite(cost[healed])) continue;
+          for (const medkit of medkits) {
+            const next = Math.min(needed, healed + medkit.heal);
+            cost[next] = Math.min(cost[next], cost[healed] + medkit.price);
+          }
+        }
+        return cost[needed];
+      }
+
+      function checkHealthEmergency() {
+        if (state.ended || state.health >= 35) return;
+        if (state.cash < forcedRestCost() && state.cash < minimumMedkitCostToReachWorkHealth()) {
+          endGame(false, "Bancarotta: la salute è sotto il 35% e non hai abbastanza denaro per un medikit o per sostenere i pasti e l'affitto durante il riposo forzato. La partita è finita: ricomincia da capo.");
+        }
+      }
+
+      function takeForcedRest() {
+        if (state.ended || state.health >= 35) return showToast("Il riposo forzato è disponibile solo sotto il 35% di salute.");
+        const days = forcedRestDays();
+        const cost = forcedRestCost();
+        if (state.cash < cost) return showToast(`Per il riposo forzato servono almeno ${money(cost)} per pasti e affitto.`);
+        for (let offset = 0; offset < days; offset++) {
+          const isCurrentDay = offset === 0;
+          const mealCost = isCurrentDay ? forcedRestMealCost() : 12;
+          const nutrition = isCurrentDay
+            ? (state.meals.breakfast ? 0 : 14) + (state.meals.lunch ? 0 : 20) + (state.meals.dinner ? 0 : 25)
+            : 59;
+          state.cash -= mealCost;
+          state.hunger = clamp(state.hunger + nutrition);
+          state.water = 100;
+          state.energy = 100;
+          state.meals = { breakfast: true, lunch: true, dinner: true };
+          state.timeMinutes = NIGHT_START;
+          log(`Riposo forzato: pasti minimi per il giorno ${state.day}.`);
+          finishDay();
+          if (state.ended) break;
+        }
+        if (!state.ended) {
+          state.health = 100;
+          state.energy = 100;
+          log(`Riposo completato: ${days} giorni di cura, salute ed energia al massimo.`);
+          checkHealthEmergency();
+        }
+        save(); render();
+        if (!state.ended) showToast(`Riposo forzato completato: ${days} giorni, salute ed energia al 100%.`);
+      }
+
+      function sleepNight() {
+        if (!isNight()) return showToast("Puoi dormire solo dalle 20:00 in poi.");
+        finishDay(50);
+        checkHealthEmergency();
+        save(); render();
+        if (!state.ended) showToast("Hai dormito tutta la notte: +50 energia.");
+      }
+
+      function waitUntilNight() {
+        if (isNight()) return;
+        state.timeMinutes = NIGHT_START;
+        log("Hai aspettato il calare della notte.");
+        save(); render();
+      }
+
+      function doAction(callback, minutes = 0) {
+        if (state.ended) return;
+        if (!canSpendTime(minutes)) return showToast("È ora di riposare: le attività diurne terminano alle 20:00.");
+        callback();
+        if (!state.ended) {
+          state.timeMinutes += minutes;
+          updateCareerMilestones();
+          checkHealthEmergency();
+        }
+        save(); render();
+      }
+
+      function buyJob(job) {
+        if (state.health < 35) return showToast("Con la salute sotto il 35% non puoi lavorare.");
+        if (state.energy < job.energy) return showToast("Sei troppo stanca per un altro turno. Riposa un giorno.");
+        doAction(() => {
+          state.energy = clamp(state.energy - job.energy);
+          state.cash += job.pay;
+          log(`${job.name}: +${money(job.pay)}. Il turno è finito.`);
+          showToast(`Turno completato: hai guadagnato ${money(job.pay)}.`);
+        }, 180);
+      }
+
+      function buyNightJob() {
+        if (state.ended) return;
+        if (!isNight()) return showToast("Il lavoro notturno è disponibile dalle 20:00.");
+        if (state.health < 50) return showToast("Per il lavoro notturno serve almeno il 50% di salute.");
+        if (state.day - state.lastNightShiftDay < 7) return showToast("Hai già fatto un turno notturno negli ultimi sette giorni.");
+        state.cash += nightJob.pay;
+        state.health = clamp(state.health - 15);
+        const styleLost = 7;
+        state.style -= styleLost;
+        state.lastNightShiftDay = state.day;
+        log(`Lavoro notturno: +${money(nightJob.pay)}, −15 salute, −${styleLost} stile. Nessun recupero di energia.`);
+        finishDay();
+        checkHealthEmergency();
+        save(); render();
+        if (!state.ended) showToast(`Turno notturno concluso: +${money(nightJob.pay)}, −15 salute, −${styleLost} stile. L'energia non è stata recuperata.`);
+      }
+
+      function isRunwayNight() {
+        return state.day % 7 === 0 && isNight() && state.lastRunwayDay !== state.day;
+      }
+
+      function runwayPanelMarkup() {
+        if (!state.noticed) return "";
+        const isFinale = state.finaleUnlocked;
+        const ownsGown = state.wardrobe.includes(princessGownId);
+        const wearingGown = state.wornOutfit && state.wornOutfit.mode === "dress" && state.wornOutfit.dress === princessGownId;
+        const daysUntilRunway = 7 - ((state.day - 1) % 7);
+        const available = isRunwayNight();
+        let description;
+        let payLabel = "";
+        if (isFinale) {
+          description = !ownsGown ? "Ritira gratuitamente l'abito dorato in atelier e poi indossalo dall'Armadio."
+            : !wearingGown ? "Indossa l'abito dorato da principessa dall'Armadio per prepararti al gran finale."
+            : available ? "È il momento dell'ultima passerella: il mondo ti aspetta."
+            : state.day % 7 === 0 ? "Il gran finale ti aspetta stasera dalle 20:00."
+            : `Il gran finale è alla fine della settimana, tra ${daysUntilRunway} ${daysUntilRunway === 1 ? "giorno" : "giorni"}.`;
+          return `<div class="runway-panel"><strong>Gran finale · Miglior modella al mondo</strong><p>${description}</p>
+            <button type="button" class="cta" data-runway ${!available || !ownsGown || !wearingGown ? "disabled" : ""}>Sfila con l'abito dorato</button></div>`;
+        }
+        const pay = state.runwayCount < 7 ? 2500 : 8000;
+        description = available ? "La passerella di fine settimana è pronta. Dopo lo show riprenderà una nuova settimana."
+          : state.day % 7 === 0 ? "La sfilata si svolge stasera, dalle 20:00."
+          : `La prossima passerella è a fine settimana, tra ${daysUntilRunway} ${daysUntilRunway === 1 ? "giorno" : "giorni"}.`;
+        payLabel = `Cachet ${money(pay)} · ${state.runwayCount < 7 ? "principiante" : state.expertUnlocked ? "esperta" : "dopo le prime 7"}`;
+        return `<div class="runway-panel"><strong>Passerella · ${state.runwayCount}/15</strong><p>${description} ${payLabel}.</p>
+          <button type="button" class="cta" data-runway ${!available ? "disabled" : ""}>${available ? "Sfila stasera" : "Passerella di fine settimana"}</button></div>`;
+      }
+
+      function performRunway() {
+        if (state.ended || !state.noticed) return;
+        if (!isRunwayNight()) return showToast("La passerella è disponibile solo la sera dell'ultimo giorno della settimana.");
+        if (state.finaleUnlocked) {
+          const wearingGown = state.wornOutfit && state.wornOutfit.mode === "dress" && state.wornOutfit.dress === princessGownId;
+          if (!state.wardrobe.includes(princessGownId) || !wearingGown) return showToast("Per il gran finale devi ritirare e indossare l'abito dorato da principessa.");
+          state.finalShowComplete = true;
+          state.ended = true;
+          log("Gran finale: hai sfilato con l'abito dorato e sei diventata la miglior modella al mondo.");
+          save(); render();
+          endGame(true, "Con l'abito dorato da principessa hai conquistato l'ultima passerella. Sei la miglior modella al mondo!");
+          return;
+        }
+        const pay = state.runwayCount < 7 ? 2500 : 8000;
+        state.cash += pay;
+        state.runwayCount++;
+        state.lastRunwayDay = state.day;
+        log(`Passerella ${state.runwayCount}: cachet di ${money(pay)}.`);
+        updateCareerMilestones();
+        finishDay(50);
+        checkHealthEmergency();
+        save(); render();
+        if (!state.ended) showToast(`Passerella completata! +${money(pay)}. Sfilate: ${state.runwayCount}.`);
+      }
+
+      function cardMarkup(item, type) {
+        const owned = type === "basic" ? state.basics.includes(item.id) : state.wardrobe.includes(item.id);
+        const affordable = state.cash >= item.price;
+        const isLuxury = type === "luxury";
+        const canBuy = !owned && affordable && canSpendTime(60);
+        return `<button type="button" class="action-card shop-card" data-buy="${type}:${item.id}" ${canBuy ? "" : "disabled"}>
+          <div class="product-visual ${isLuxury ? "" : "regular"}">${item.icon}</div>
+          <span class="card-title">${item.name}</span>
+          <span class="card-description">${item.desc}</span>
+          <span class="card-meta"><span>${owned ? "Nell'armadio" : money(item.price)}</span><small>${owned ? "Acquistato" : canBuy ? "Compra · 1 h" : "Vetrina · non ancora"}</small></span>
+        </button>`;
+      }
+
+      function productSvg(item, colorIndex, instance = "") {
+        const color = luxuryColors[colorIndex].color;
+        const tint = (amount) => {
+          const channels = color.match(/[0-9a-f]{2}/gi).map((part) => parseInt(part, 16));
+          return `#${channels.map((channel) => Math.round(channel + (amount < 0 ? channel : 255 - channel) * amount).toString(16).padStart(2, "0")).join("")}`;
+        };
+        const shapes = {
+          top: '<path d="M37 18 20 24 8 44l12 10 8-11v34h44V43l8 11 12-10-12-20-18-6c-2 8-7 12-13 12s-11-4-12-12z"/>',
+          bottom: '<path d="M24 13h52l-5 34 8 44H56l-6-34-6 34H27l7-44z"/>',
+          skirt: '<path d="M36 17h28l-3 18 18 49H21l18-49z"/>',
+          dress: '<path d="M40 14h20l4 14 17 10-13 15 11 41H21l11-41L19 38l17-10z"/>',
+          jumpsuit: '<path d="M37 15h26l7 25-8 10 5 39H52l-2-29-3 29H30l8-39-8-10z"/>',
+          outerwear: '<path d="M38 15h24l5 11 17 9-9 20-9-7v40H34V48l-9 7-9-20 17-9z"/><path d="M49 18h3v68h-3z" fill="#ffffff" opacity=".5"/>',
+          shoes: '<path d="M16 63c12 0 21-9 27-27l9 4c3 15 12 20 26 23l10 12c2 5-2 9-8 9H20c-9 0-13-7-4-21z"/>',
+          bag: '<path d="M24 37h52l7 48H17z"/><path d="M35 39c0-25 30-25 30 0" fill="none" stroke="#f4f0e9" stroke-width="5"/>',
+          accessory: '<path d="M50 17c-18 17-22 28 0 48 22-20 18-31 0-48z"/><circle cx="50" cy="72" r="13" fill="none" stroke="#f4f0e9" stroke-width="5"/>',
+          necklace: '<path d="M24 22c1 31 12 42 26 42s25-11 26-42" fill="none" stroke="#f4f0e9" stroke-width="4"/><path d="M50 56 41 68l9 13 9-13z"/>',
+          sunglasses: '<path d="M12 37h31l-3 23c-7 10-22 8-25 0zm45 0h31l-3 23c-3 8-18 10-25 0z"/><path d="M43 43h14M12 41 5 36m83 5 7-5" fill="none" stroke="#f4f0e9" stroke-width="3"/>'
+        };
+        const itemShapes = {
+          "heels-1000": '<path d="M7 68c12 0 20-8 26-27l8 3 6 17c7 5 17 7 28 8l9 7c1 4-2 7-7 7H16c-8 0-11-6-9-15zm24-2-2 17h-4l-1-15zm21-24c9 0 14-7 18-21l7 3 3 15c5 4 10 5 14 7l4 6c1 3-2 5-5 5H59c-8 0-10-6-7-15zm18-1-2 15h-4l-1-13z"/>',
+          "boots-2000": '<path d="M13 18h23l-2 40 14 9 2 11c0 4-3 6-7 6H14c-6 0-8-4-5-10l8-8zm42 7h20l-3 32 12 8 3 11c1 4-2 6-6 6H55c-6 0-8-4-5-10l8-8z"/>',
+          "runway-heels-3000": '<path d="M8 68c13 0 21-8 27-27l7 3 5 17c8 5 18 7 28 8l8 7c1 4-2 7-7 7H17c-8 0-11-6-9-15zm24-2-2 17h-4l-1-15zm22-25c9 0 14-7 18-21l7 3 3 15c4 3 9 5 13 7l4 6c1 3-2 5-5 5H60c-8 0-10-6-6-15zm19-1-2 15h-4l-1-13z"/>',
+          "sneakers-1100": '<path d="M7 66c11 0 18-8 23-22l10 4 8 14 23 5 10 8c2 5-1 8-7 8H16c-9 0-12-7-9-17zm47-23c8 0 13-6 17-17l8 4 4 12 10 4 5 7c1 4-2 7-7 7H60c-8 0-10-6-6-17z"/>',
+          "loafers-1300": '<path d="M7 69c12 0 18-8 23-22l8 3 7 14 25 6 9 7c1 4-2 7-7 7H16c-8 0-11-6-9-15zm47-24c8 0 13-6 16-17l7 3 4 13 10 4 5 6c1 4-2 6-6 6H60c-8 0-10-6-6-15z"/>',
+          "ankle-boots-1800": '<path d="M12 36h23l-1 25 12 7 2 10c0 4-3 6-7 6H14c-6 0-8-4-5-9l7-7zm43-6h21l-2 31 13 7 2 10c1 4-2 6-6 6H56c-6 0-8-4-5-9l7-8z"/>',
+          "platform-heels-2300": '<path d="M7 65c12 0 19-9 25-27l8 3 6 18c7 4 18 6 28 7l10 8c1 5-2 8-7 8H16c-8 0-11-7-9-17zm20 9h52v6H18zm27-32c8 0 13-7 17-21l8 3 3 15c5 3 10 4 14 7l4 6c1 3-2 5-6 5H60c-8 0-10-6-6-15zm18-1-2 15h-4l-1-13z"/>',
+          "cocktail-dress-1000": '<path d="M40 14h20l4 13 12 9-10 11 8 19H26l8-19-10-11 12-9z"/>',
+          "mini-dress-1500": '<path d="M40 14h20l4 13 13 10-10 11 7 16H26l7-16-10-11 13-10z"/>',
+          "mini-a-line-1300": '<path d="M40 14h20l4 13 12 9-10 11 8 25H26l8-25-10-11 12-9z"/>',
+          "princess-gown": '<path d="M40 13h20l5 14 15 11-13 18 21 41H12l21-41-13-18 15-11z"/>',
+          "slip-mini-1700": '<path d="M40 13h20l5 8 13 5-8 15 5 28H25l5-28-8-15 13-5z"/>',
+          "wrap-midi-2100": '<path d="M40 14h20l4 14 16 10-12 15 8 37H24l8-37-12-15 16-10z"/>',
+          "column-dress-2400": '<path d="M40 14h20l4 14 15 10-10 15 8 38H23l8-38-10-15 15-10z"/>',
+          "slit-gown-2800": '<path d="M40 14h20l4 14 17 10-13 15 10 42H22l11-42-13-15 16-10z"/>',
+          "ball-gown-3000": '<path d="M40 14h20l5 13 15 10-12 17 20 41H12l20-41-12-17 15-10z"/>',
+          "evening-dress-2000": '<path d="M40 14h20l4 14 16 10-12 15 9 42H23l9-42-12-15 16-10z"/>',
+          "couture-gown-3000": '<path d="M40 14h20l4 14 18 10-13 16 13 41H8l16-41-13-16 17-10z"/>'
+        };
+        const details = {
+          "tee": '<path d="M37 18 50 31l13-13-7-5c-2 7-10 7-12 0zM50 32v43m-8-29h5" fill="none"/>',
+          "jeans": '<path d="M36 17h28m-25 5-4 23m30-23 4 23M50 48v36m-14-23h12m4 0h12" fill="none"/>',
+          "blouse-1000": '<path d="m43 19 7 11 7-11-7-4zM50 32v43" fill="none"/>',
+          "silk-top-2000": '<path d="M36 19v-5m28 5v-5M50 32v43M29 52h42" fill="none"/>',
+          "couture-top-3000": '<path d="m38 20 12 10 12-10M50 31v44M37 45h26M40 57h20" fill="none"/>',
+          "trousers-1000": '<path d="M39 18v26m22-26v26M50 48v37" fill="none"/>',
+          "tailored-pants-2000": '<path d="M36 46h28M40 49l-5 35m25-35 5 35M50 47v37" fill="none"/>',
+          "runway-pants-3000": '<path d="M37 18v26m26-26v26M50 48v37m-13-3h12m2 0h12" fill="none"/>',
+          "cocktail-dress-1000": '<path d="M34 52h32m-19-20-8 16m21 0-8-16" fill="none"/>',
+          "evening-dress-2000": '<path d="m34 45 32 19M30 54l35 20m-15-43v43" fill="none"/>',
+          "couture-gown-3000": '<path d="M37 45h26m-13-14v47m-18-20 9 23m27-23-9 23" fill="none"/>',
+          "blazer-1000": '<path d="m38 17 12 18 12-18m-12 18v49m-9-30h7m14 0h-7" fill="none"/>',
+          "coat-2000": '<path d="m36 24 14 13 14-13m-14 13v47m-10-27h6m8 0h6m-20 12h6m8 0h6" fill="none"/>',
+          "cape-3000": '<path d="M38 25c7 12 17 12 24 0M50 32v46m0-42-13 20m13-20 13 20" fill="none"/>',
+          "heels-1000": '<path d="m45 41 12 9m-29 20 14-3m18-12 8 8" fill="none"/>',
+          "boots-2000": '<path d="M44 43v18m18-11v12m-18-8h18m-18 9h18m-32 19h36" fill="none"/>',
+          "runway-heels-3000": '<path d="m45 41 7 10 9 3m-17-10 5 10 13 4m-34 10 14-3" fill="none"/>',
+          "clutch-1000": '<path d="M18 45h66m-36-8v13m-5-7h10" fill="none"/>',
+          "handbag-2000": '<path d="M17 51h66m-28 6a5 5 0 1 1-10 0 5 5 0 0 1 10 0" fill="none"/>',
+          "runway-bag-3000": '<path d="M17 45h66m-42-8h26m-14 22v13m-5-7h10" fill="none"/>',
+          "earrings-1000": '<circle cx="36" cy="58" r="10"/><circle cx="64" cy="58" r="10"/>',
+          "necklace-1000": '<circle cx="50" cy="64" r="4"/>',
+          "necklace-2000": '<path d="M45 62 50 71l5-9" fill="none"/>',
+          "necklace-3000": '<path d="M42 64 50 57l8 7-8 17z"/>',
+          "diamond-set-3000": '<path d="M50 24 44 31l6 8 6-8zM36 58l-5 6 5 8 5-8zM64 58l-5 6 5 8 5-8z"/>',
+          "mini-a-line-1300": '<path d="M37 50h26m-10-19v37"/>',
+          "princess-gown": '<path d="M37 42h26m-13-11v53m-15-30 13 34m30-34L65 88"/>',
+          "slip-mini-1700": '<path d="M37 19v-7m26 7v-7m-13 17v34"/>',
+          "wrap-midi-2100": '<path d="m34 38 32 38m-16-44v45m-16-22h32"/>',
+          "column-dress-2400": '<path d="M50 31v58m-15-39h30"/>',
+          "slit-gown-2800": '<path d="M50 31v58m14-31-2 31m-28-39h32"/>',
+          "ball-gown-3000": '<path d="M36 44h28m-14-13v36m-20 1 11-22m29 22L59 46"/>',
+          "sneakers-1100": '<path d="m25 69 16 3 5 7H18zm48-25 7 13m-11-10 7 13m-14-9 7 13"/>',
+          "loafers-1300": '<path d="M20 70c7-1 13-5 17-12 3 7 7 11 13 13m12-28 7 12m-3 7 10 3"/>',
+          "ankle-boots-1800": '<path d="M19 41h15m24-6h16M16 65h27m18 1h25m-46 6 5 7m20-7 5 7"/>',
+          "platform-heels-2300": '<path d="M21 71h23m-11-8 4 8 3 9m26-36 8 14"/>',
+          "shirt-1600": '<path d="m39 18 11 13 11-13-11-4zM50 32v43m-4-32h8m-8 12h8" fill="none"/>',
+          "knit-1800": '<path d="M37 25 21 41l10 10 8-8v35h22V43l8 8 10-10-16-16-7-4c-2 7-10 7-12 0zM40 58h20" fill="none"/>',
+          "asym-top-2400": '<path d="M37 20 23 29l8 13 10-7 3 39h24V39l8 6 5-14-19-12c-7 8-16 7-25 1zM50 39v35" fill="none"/>',
+          "pencil-skirt-1200": '<path d="M39 35h22m-19 6-8 37m31-37 8 37M50 38v35" fill="none"/>',
+          "pleated-skirt-2100": '<path d="M39 37l-12 41m18-41-4 41m9-41v41m8-41 4 41m-1-41 12 41" fill="none"/>',
+          "shorts-1400": '<path d="M36 43h28m-28 3-4 31h18l3-20 4 20h18l-4-31m-18-7v17" fill="none"/>',
+          "jumpsuit-1800": '<path d="m41 20 9 10 9-10m-9 10v17m-10 2h20m-19 3-3 30m18-30 3 30" fill="none"/>',
+          "mini-dress-1500": '<path d="M36 48h28m-2-10-20 15m10-21v16" fill="none"/>',
+          "trench-1600": '<path d="m36 24 14 13 14-13m-14 13v46m-9-26h18m-18 9h18m-25-27 11 5m26-5-11 5" fill="none"/>',
+          "leather-jacket-2400": '<path d="m38 20 12 14 12-14m-12 14v45m-10-25h20m-27-15 12 18m30-18L63 57m-25 12 7-5m13 5-7-5" fill="none"/>',
+          "fur-coat-2800": '<path d="M37 19c-10 9-10 16 0 22m26-22c10 9 10 16 0 22m-13-8v47m-11-26h22m-22 12h22m-22 11h22" fill="none"/>',
+          "tote-1500": '<path d="M17 49h66m-58 0 8 35h34l8-35M34 49c0-22 32-22 32 0m-16 8v16" fill="none"/>',
+          "crossbody-1700": '<path d="M24 42h52l5 39H19zm8-1 35-26 14 28m-28-1v13" fill="none"/>',
+          "backpack-1900": '<path d="M27 37c0-27 46-27 46 0v48H27zm0 12h46m-37 0v20h28V49m-22-12v-8m18 8v-8" fill="none"/>',
+          "belt-1000": '<path d="M19 48h62v13H19zm29-2h14v17H48zm5 5v7" fill="none"/>',
+          "bracelet-1200": '<circle cx="50" cy="52" r="24" fill="none" stroke="#f4f0e9" stroke-width="5"/><path d="m50 24 4 5-4 5-4-5z"/>',
+          "cocktail-ring-1500": '<path d="M50 36c-12 9-14 18 0 31 14-13 12-22 0-31z"/><path d="M50 66v19m-9-6h18" fill="none"/>',
+          "silk-scarf-1100": '<path d="M28 22h48L66 74 40 88l9-35zM38 30l28 30" fill="none"/>',
+          "wide-hat-1200": '<path d="M18 60c6-11 19-17 32-17s26 6 32 17l-3 8H21zM34 44c2-20 30-20 32 0" fill="none"/>',
+          "pearl-necklace-1500": '<circle cx="36" cy="45" r="3"/><circle cx="41" cy="53" r="3"/><circle cx="47" cy="58" r="3"/><circle cx="53" cy="58" r="3"/><circle cx="59" cy="53" r="3"/><circle cx="64" cy="45" r="3"/>',
+          "long-necklace-2500": '<path d="M33 24c-4 40 5 53 17 53s21-13 17-53m-8 41 7 8-7 9-9-9z" fill="none"/>',
+          "sunglasses-cat-eye": '<path d="m12 39 5 18c4-7 11-11 23-11l4-9zm76 0-5 18c-4-7-11-11-23-11l-4-9z" fill="none"/>',
+          "sunglasses-aviator": '<path d="M18 40h25v14c-1 13-21 17-24 2zm64 0H57v14c1 13 21 17 24 2zm-39 4h14m-39-4-6-5m66 5 6-5" fill="none"/>',
+          "sunglasses-oversized": '<path d="M9 34h36v22c-2 17-27 18-32 2zm46 0h36v24c-5 16-30 15-32-2zm-10 8h10" fill="none"/>'
+        };
+        const shape = itemShapes[item.id] || shapes[item.category];
+        const id = `material-${item.id}${instance}`;
+        const hanger = ["top", "dress", "jumpsuit", "outerwear"].includes(item.category) && !itemShapes[item.id]
+          ? '<path d="M43 14c0-7 14-7 14 0l-7 6-29 12h58L50 20" fill="none" stroke="#efc783" stroke-opacity=".68" stroke-width="1.7" stroke-linejoin="round"/>'
+          : "";
+        return `<svg viewBox="0 0 100 100" role="img" aria-label="${item.name}, colore ${luxuryColors[colorIndex].name}" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="${id}" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="${tint(.38)}"/><stop offset=".18" stop-color="${color}"/><stop offset=".48" stop-color="${tint(-.3)}"/><stop offset=".76" stop-color="${color}"/><stop offset="1" stop-color="${tint(.25)}"/>
+            </linearGradient>
+            <linearGradient id="${id}-sheen" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".36"/><stop offset=".35" stop-color="#fff" stop-opacity=".07"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+            <filter id="${id}-shadow" x="-25%" y="-20%" width="150%" height="155%"><feDropShadow dx="0" dy="3" stdDeviation="2.4" flood-color="#000" flood-opacity=".42"/></filter>
+            <clipPath id="${id}-shape">${shape}</clipPath>
+          </defs>
+          ${hanger}
+          <g filter="url(#${id}-shadow)" fill="url(#${id})" stroke="#fff4e8" stroke-opacity=".58" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">${shape}</g>
+          <rect x="8" y="12" width="84" height="76" fill="url(#${id}-sheen)" clip-path="url(#${id}-shape)" pointer-events="none"/>
+          <g fill="none" stroke="#fff5ea" stroke-opacity=".48" stroke-width=".8" stroke-linecap="round" stroke-linejoin="round">${details[item.id] || ""}</g>
+          <ellipse cx="50" cy="90" rx="26" ry="3" fill="#000" opacity=".22"/>
+        </svg>`;
+      }
+
+      function luxuryCardMarkup(item) {
+        const owned = state.wardrobe.includes(item.id);
+        const selectedColor = item.finale ? luxuryColors.length - 1
+          : Number.isInteger(state.luxuryColors[item.id]) ? state.luxuryColors[item.id] : 0;
+        const colorIndex = Math.max(0, Math.min(luxuryColors.length - 1, selectedColor));
+        const canBuy = !owned && (!item.finale || state.finaleUnlocked) && state.cash >= item.price && canSpendTime(60);
+        return `<article class="luxury-card" ${item.finale ? 'id="finaleGownCard"' : ""}>
+          <div class="luxury-image">${productSvg(item, colorIndex, "-atelier")}</div>
+          <span class="luxury-category">${item.finale ? "Regalo esclusivo · gratuito" : `${item.categoryName} · ${money(item.price)}`}</span>
+          <span class="card-title">${item.name}</span>
+          <span class="card-description">${item.desc}</span>
+          <div class="color-choice-label">Colore: <strong>${luxuryColors[colorIndex].name}</strong></div>
+          <div class="color-choices" role="group" aria-label="Colore ${item.name}">
+            ${luxuryColors.map((color, index) => ({ color, index })).filter(({ index }) => !item.finale || index === colorIndex).map(({ color, index }) => `<button type="button" class="color-choice ${index === colorIndex ? "selected" : ""}" data-color-item="${item.id}" data-color-index="${index}" style="--swatch:${color.color}" aria-label="${color.name}" title="${color.name}" aria-pressed="${index === colorIndex}" ${owned || item.finale ? "disabled" : ""}></button>`).join("")}
+          </div>
+          <button type="button" class="cta ${owned ? "subtle" : ""}" data-buy="luxury:${item.id}" ${canBuy ? "" : "disabled"}>${owned ? item.finale ? "Pronto per il gran finale" : `Nell'armadio · +${item.style} stile` : item.finale ? canBuy ? "Ritira gratis" : "In vetrina · gratis" : canBuy ? `Acquista · ${money(item.price)}` : `In vetrina · ${money(item.price)}`}</button>
+        </article>`;
+      }
+
+      function closetCardMarkup(item, isLuxury) {
+        const colorIndex = isLuxury && item.finale ? luxuryColors.length - 1
+          : isLuxury && Number.isInteger(state.luxuryColors[item.id])
+          ? Math.max(0, Math.min(luxuryColors.length - 1, state.luxuryColors[item.id]))
+          : isLuxury ? 0 : 4;
+        return `<article class="luxury-card closet-item">
+          <div class="luxury-image">${productSvg(item, colorIndex, "-closet")}</div>
+          <span class="luxury-category">${item.categoryName} · ${isLuxury ? "Atelier" : "Essenziale"}</span>
+          <span class="card-title">${item.name}</span>
+          <span class="card-description">${item.desc}</span>
+          <span class="card-meta"><span>${money(item.price)}</span><small>${isLuxury ? `+${item.style} stile` : "Indossato in città"}</small></span>
+        </article>`;
+      }
+
+      function wornOutfitMarkup() {
+        if (!outfitIsComplete(state.wornOutfit)) return `<p class="outfit-hint">Nessun outfit completo indossato. Scegli scarpe e un completo coordinato qui sopra.</p>`;
+        const worn = state.wornOutfit;
+        const ids = worn.mode === "dress"
+          ? [worn.dress, worn.shoes, worn.accessory]
+          : [worn.top, worn.bottom, worn.shoes, worn.accessory];
+        return `<div class="worn-look">${ids.filter(Boolean).map((id) => {
+          const item = findClothingItem(id);
+          if (!item) return "";
+          const colorIndex = item.finale ? luxuryColors.length - 1
+            : Number.isInteger(state.luxuryColors[item.id]) ? state.luxuryColors[item.id] : 4;
+          return `<div class="worn-look-item">${productSvg(item, colorIndex, "-worn")}<span>${item.name}</span></div>`;
+        }).join("")}</div>`;
+      }
+
+      function medkitCardMarkup(item) {
+        const canBuy = state.health < 100 && state.cash >= item.price;
+        const healing = Math.min(item.heal, 100 - state.health);
+        return `<button type="button" class="action-card shop-card" data-medkit="${item.id}" ${canBuy ? "" : "disabled"}>
+          <div class="product-visual regular">✚</div>
+          <span class="card-title">${item.name}</span>
+          <span class="card-description">${item.desc}</span>
+          <span class="card-meta"><span>${money(item.price)}</span><small>${state.health >= 100 ? "Salute al massimo" : canBuy ? `+${Math.round(healing)} salute · subito` : "Non disponibile"}</small></span>
+        </button>`;
+      }
+
+      function mealCardMarkup(slot, item) {
+        const done = slot === "breakfast"
+          ? item.id === "combo"
+            ? state.breakfastOrder.coffee || state.breakfastOrder.croissant
+            : state.breakfastOrder[item.id]
+          : state.meals[slot];
+        const affordable = state.cash >= item.price;
+        const canEat = !done && affordable && canSpendTime(30);
+        const description = item.desc || `Un pasto caldo: ${item.hunger} punti fame recuperati.`;
+        return `<button type="button" class="action-card" data-meal="${slot}:${item.id}" ${canEat ? "" : "disabled"}>
+          <span class="card-icon">${slot === "breakfast" ? "☕" : slot === "lunch" ? "♨" : "✦"}</span>
+          <span class="card-title">${item.name}</span>
+          <span class="card-description">${description}</span>
+          <span class="card-meta"><span>${money(item.price)}</span><small>${done ? "Pasto fatto" : `+${item.hunger} fame · 30 min`}</small></span>
+        </button>`;
+      }
+
+      function renderPanel() {
+        const panel = $("#panel");
+        if (state.tab === "work") {
+          panel.innerHTML = `<div class="panel-header"><div><h2>Fai il prossimo turno</h2><p class="panel-lede">Ogni turno dura 3 ore. Organizza lavoro, pasti e pause prima del riposo notturno.</p></div><span class="location-tag">Downtown · ${clockText(state.timeMinutes)}</span></div>
+            ${state.health < 35 ? `<div class="health-warning"><strong>Salute critica · ${Math.round(state.health)}%</strong><p>Non puoi lavorare sotto il 35%. Cura la salute al market oppure riposati: ${forcedRestDays()} giorni di cure costano almeno ${money(forcedRestCost())} tra pasti e affitto.</p><button type="button" class="cta" data-forced-rest ${state.cash < forcedRestCost() ? "disabled" : ""}>Riposo forzato · ${forcedRestDays()} giorni · ${money(forcedRestCost())}</button><span class="emergency-note">Recuperi salute ed energia al 100%. Se non puoi permetterti né le cure né il riposo, la partita finisce per bancarotta.</span></div>` : ""}
+            <div class="cards">${jobs.map((job, index) => `<button type="button" class="action-card" data-job="${index}" ${state.health < 35 || state.energy < job.energy || !canSpendTime(180) ? "disabled" : ""}>
+              ${index === 2 ? '<span class="card-tag">Più paga</span>' : ""}
+              <span class="card-icon">${job.icon}</span><span class="card-title">${job.name}</span>
+              <span class="card-description">${job.desc}</span><span class="card-meta"><span>+${money(job.pay)}</span><small>−${job.energy} energia · 3 h</small></span>
+            </button>`).join("")}
+              <button type="button" class="action-card" data-night-job ${!isNight() || state.health < 50 || state.day - state.lastNightShiftDay < 7 ? "disabled" : ""}>
+                <span class="card-tag">Una volta a settimana</span><span class="card-icon">☾</span><span class="card-title">Lavoro notturno</span>
+                <span class="card-description">${!isNight() ? "Disponibile dalle 20:00." : state.day - state.lastNightShiftDay < 7 ? "Turno già svolto negli ultimi sette giorni." : state.health < 50 ? "Serve almeno il 50% di salute." : "Una notte in bianco: nessun recupero di energia."}</span>
+                <span class="card-meta"><span>+${money(nightJob.pay)}</span><small>−15 salute · −7 stile · paga speciale</small></span>
+              </button>
+            </div>
+            ${runwayPanelMarkup()}
+            <div class="split-card">
+              <button type="button" class="action-card compact-card" data-sleep ${isNight() ? "" : "disabled"}>
+                <span class="card-icon">☾</span><span class="compact-copy"><span class="card-title">${isNight() ? "Dormi fino alle 06:00" : "Riposo notturno"}</span><span class="card-description">${isNight() ? "La giornata termina; recuperi 50 energia." : "Disponibile dalle 20:00."}</span></span><span class="card-meta">+50 ✧</span>
+              </button>
+              <button type="button" class="action-card compact-card" data-wait ${isNight() ? "disabled" : ""}>
+                <span class="card-icon">◷</span><span class="compact-copy"><span class="card-title">Aspetta la notte</span><span class="card-description">Avanza l'orologio fino alle 20:00.</span></span><span class="card-meta">${isNight() ? "È notte" : "20:00"}</span>
+              </button>
+            </div>
+            <div class="panel-header" style="margin:18px 0 11px"><div><h2 style="font-size:20px">Piccole pause</h2><p class="panel-lede">Usate oggi: ${state.breaksUsed}/2 · 15 minuti ciascuna.</p></div></div>
+            <div class="cards">
+              <button type="button" class="action-card compact-card" data-break="reading" ${state.breaksUsed >= 2 || !canSpendTime(15) ? "disabled" : ""}>
+                <span class="card-icon">▤</span><span class="compact-copy"><span class="card-title">Pausa lettura</span><span class="card-description">Stacca un momento e recupera energie.</span></span><span class="card-meta">+5 ✧</span>
+              </button>
+              <button type="button" class="action-card compact-card" data-break="coffee" ${state.breaksUsed >= 2 || state.cash < 2 || !canSpendTime(15) ? "disabled" : ""}>
+                <span class="card-icon">☕</span><span class="compact-copy"><span class="card-title">Pausa caffè</span><span class="card-description">Un caffè al bancone, −€2.</span></span><span class="card-meta">+10 ✧</span>
+              </button>
+            </div>
+            <div class="split-card">
+              <button type="button" class="action-card compact-card" data-pay-rent ${state.rentDebt <= 0 || state.cash < state.rentDebt ? "disabled" : ""}>
+                <span class="card-icon">⌂</span><span class="compact-copy"><span class="card-title">Regolarizza l'affitto</span><span class="card-description">${state.rentDebt > 0 ? `Arretrati: ${money(state.rentDebt)}.` : "Nessun arretrato da saldare."}</span></span><span class="card-meta">${state.rentDebt > 0 ? money(state.rentDebt) : "—"}</span>
+              </button>
+            </div>
+            <p class="inline-note">Colazione, pranzo e cena si fanno al market. Saltare la colazione costa 2 punti salute; saltare il pranzo ne costa 10. I capelli crescono di una lunghezza ogni settimana.</p>`;
+        } else if (state.tab === "market") {
+          panel.innerHTML = `<div class="panel-header"><div><h2>Il market del quartiere</h2><p class="panel-lede">Tre pasti al giorno: scegli una colazione, un pranzo e una cena prima di andare a dormire.</p></div><span class="location-tag">Aperto · ${clockText(state.timeMinutes)}</span></div>
+            <div class="panel-header" style="margin:0 0 11px"><div><h2 style="font-size:20px">Medikit</h2><p class="panel-lede">Le cure ripristinano la salute fino a un massimo del 100%.</p></div></div>
+            <div class="shop-grid">${medkits.map(medkitCardMarkup).join("")}</div>
+            <div class="panel-header" style="margin:0 0 11px"><div><h2 style="font-size:20px">Colazione</h2><p class="panel-lede">Cappuccino o caffè €2, cornetto €2. Puoi sommarli per €4.</p></div></div>
+            <div class="cards">${breakfastOptions.map((item) => mealCardMarkup("breakfast", item)).join("")}</div>
+            <div class="panel-header" style="margin:22px 0 11px"><div><h2 style="font-size:20px">Pranzo</h2><p class="panel-lede">Un piatto tra carne, pesce, pasta o verdure: €5. Due insieme: €9.</p></div></div>
+            <div class="shop-grid">${lunchOptions.map((item) => mealCardMarkup("lunch", item)).join("")}</div>
+            <div class="panel-header" style="margin:22px 0 11px"><div><h2 style="font-size:20px">Cena</h2><p class="panel-lede">Dalla pizza al sushi: scegli in base al tuo budget.</p></div></div>
+            <div class="shop-grid">${dinnerOptions.map((item) => mealCardMarkup("dinner", item)).join("")}</div>
+            <div class="panel-header" style="margin:22px 0 11px"><div><h2 style="font-size:20px">Acqua e vestiti quotidiani</h2><p class="panel-lede">Una bottiglia costa €3. I pasti vengono preparati al momento.</p></div></div>
+            <div class="cards">
+              <button type="button" class="action-card" data-supply="water" ${state.cash < 3 || !canSpendTime(30) ? "disabled" : ""}><span class="card-icon">◌</span><span class="card-title">Compra acqua</span><span class="card-description">Una bottiglia fresca da tenere con te.</span><span class="card-meta"><span>−€3</span><small>+1 bottiglia · 30 min</small></span></button>
+              <button type="button" class="action-card" data-use-water ${state.bottles < 1 || !canSpendTime(15) ? "disabled" : ""}><span class="card-icon">◍</span><span class="card-title">Bevi acqua</span><span class="card-description">Consuma una bottiglia dalla dispensa.</span><span class="card-meta"><span>−1 bottiglia</span><small>+48 sete · 15 min</small></span></button>
+            </div>
+            <div class="panel-header" style="margin:22px 0 11px"><div><h2 style="font-size:20px">Energia</h2><p class="panel-lede">Una ricarica veloce per affrontare un altro turno.</p></div></div>
+            <div class="cards">
+              <button type="button" class="action-card" data-energy-bar ${state.energy >= 100 || state.cash < 5 || !canSpendTime(15) ? "disabled" : ""}>
+                <span class="card-icon">⚡</span><span class="card-title">Barretta energetica</span><span class="card-description">Una pausa veloce per rimetterti in moto.</span>
+                <span class="card-meta"><span>−€5</span><small>${state.energy >= 100 ? "Energia al massimo" : `+${Math.min(10, 100 - state.energy)} energia · 15 min`}</small></span>
+              </button>
+            </div>
+            <div class="panel-header" style="margin:22px 0 11px"><div><h2 style="font-size:20px">Vestiti normali</h2><p class="panel-lede">Capi pratici per affrontare i turni, prima dei vestiti di lusso.</p></div></div>
+            <div class="shop-grid">${basics.map((item) => cardMarkup(item, "basic")).join("")}</div>
+            <p class="inline-note">Ogni pasto occupa mezz'ora. Alla fine della giornata, dormire azzera i pasti e le pause e recupera 50 energia.</p>`;
+        } else if (state.tab === "atelier") {
+          const atelierNote = !state.noticed
+            ? `Per farti notare servono capi di lusso per almeno €10.000, almeno €500 in tasca e 2 scatti nel portfolio. Valore attuale: ${money(wardrobeValue())}.`
+            : !state.expertUnlocked
+              ? `Obiettivo 2/3: completa 7 passerelle (le prime 7 pagano €2.500 ciascuna) e raggiungi €30.000 di capi. Attuale: ${state.runwayCount}/7 passerelle · ${money(wardrobeValue())}/€30.000.`
+              : !state.finaleUnlocked
+                ? `Obiettivo 3/3: raggiungi 15 passerelle e acquista ogni modello dell'atelier almeno una volta: basta un colore a scelta per capo, non tutti e sette. Dopo le prime 7, il cachet è €8.000 a sfilata.`
+                : "Obiettivi completati: ritira gratis l'abito dorato da principessa, indossalo e preparati al gran finale di fine settimana.";
+          panel.innerHTML = `<div class="panel-header"><div><h2>Le vetrine di Rue Royale</h2><p class="panel-lede">Capi da sogno, prezzi da capogiro. Puoi curiosare quanto vuoi: compra solo quando il necessario è al sicuro.</p></div><span class="location-tag">Atelier di lusso</span></div>
+            <p class="inline-note">Ogni capo è disponibile in sette colori e ha un'illustrazione con dettagli propri. Vestiti, scarpe e accessori hanno modelli da €1.000 a €3.000; solo gli occhiali da sole costano meno, da €450 a €780.</p>
+            <div class="shop-grid">${luxury.filter((item) => !item.finale || state.finaleUnlocked).map(luxuryCardMarkup).join("")}</div>
+            <p class="inline-note">${atelierNote}</p>`;
+        } else if (state.tab === "studio") {
+          panel.innerHTML = `<div class="panel-header"><div><h2>Il tuo stile, le tue regole</h2><p class="panel-lede">La prima scelta iniziale era gratuita; i cambi di colore e i tagli successivi si pagano.</p></div><span class="location-tag">Studio di bellezza</span></div>
+            <p class="inline-note">Lunghezza attuale: ${hairLengthNames[state.hairLength]} · crescita naturale: una lunghezza ogni 7 giorni (${state.hairGrowthDays}/7).</p>
+            <div class="style-options" style="margin-top:12px">
+              ${hairLengths.map((length, index) => `<button type="button" class="action-card style-card" data-haircut="${index}" ${index === state.hairLength || state.cash < 20 || !canSpendTime(60) ? "disabled" : ""}>
+                <span class="card-icon">✂</span><span class="card-title">Taglio ${haircutNames[index]}</span><span class="card-description">${index > state.hairLength ? "Allunga la piega con un servizio in salone." : "Accorcia e ridefinisce la tua silhouette."}</span>
+                <span class="card-meta"><span>−€20 · +6 stile</span><small>1 h</small></span>
+              </button>`).join("")}
+              ${hairOptions.map((option, index) => `<button type="button" class="action-card style-card" data-hair-color="${index}" ${index === state.hair || state.cash < 18 || !canSpendTime(60) ? "disabled" : ""}>
+                <span class="card-icon">◉</span><span class="card-title">Colore ${option.name.toLowerCase()}</span><span class="card-description">Una nuova tinta professionale per cambiare immagine.</span>
+                <span class="card-meta"><span>−€18</span><small>1 h</small></span>
+              </button>`).join("")}
+              <button type="button" class="action-card style-card" data-beauty="brows" ${state.cash < 12 || !canSpendTime(60) ? "disabled" : ""}>
+                <span class="card-icon">⌁</span><span class="card-title">Sopracciglia curate</span><span class="card-description">Un dettaglio preciso per mettere in risalto lo sguardo.</span>
+                <span class="card-meta"><span>−€12 · +4 stile</span><small>1 h</small></span>
+              </button>
+            </div>
+            <div class="portfolio-card"><div class="portfolio-art">✧</div><div class="portfolio-copy"><strong>Un primo scatto per il portfolio</strong><p>Sessione essenziale in studio. Ogni scatto documenta la tua crescita e ti avvicina al casting.</p></div><button type="button" class="cta" data-photo ${state.cash < 38 || !canSpendTime(120) ? "disabled" : ""}>Scatta · €38</button></div>
+            <div class="portfolio-card"><div class="portfolio-art">▧</div><div class="portfolio-copy"><strong>Portfolio attuale</strong><p>${state.portfolio} ${state.portfolio === 1 ? "scatto pronto" : "scatti pronti"} · ${state.style} punti stile. Servono €10.000 di capi di lusso, €500 in tasca e due scatti per farsi notare.</p></div><span class="status-tag">${state.portfolio >= 2 ? "Pronto" : "In costruzione"}</span></div>`;
+        } else {
+          const ownedBasics = basics.filter((item) => state.basics.includes(item.id));
+          const ownedLuxury = luxury.filter((item) => state.wardrobe.includes(item.id));
+          const totalItems = ownedBasics.length + ownedLuxury.length;
+          const totalValue = ownedBasics.concat(ownedLuxury).reduce((sum, item) => sum + item.price, 0);
+          const outfitMode = state.outfit.mode === "dress" ? "dress" : "separates";
+          panel.innerHTML = `<div class="panel-header"><div><h2>Il tuo armadio</h2><p class="panel-lede">Tutti i capi che hai raccolto nella tua nuova vita: ogni acquisto resta qui, pronto per il prossimo look.</p></div><span class="location-tag">${totalItems} ${totalItems === 1 ? "capo" : "capi"} · ${money(totalValue)}</span></div>
+            ${totalItems === 0 ? `<div class="closet-empty"><strong>Appendi qui il tuo primo look</strong>Non hai ancora acquistato vestiti. Gli essenziali sono al market, i pezzi couture in Boutique.</div>` : ""}
+            ${ownedBasics.length ? `<h3 class="closet-group">Essenziali</h3><div class="shop-grid">${ownedBasics.map((item) => closetCardMarkup(item, false)).join("")}</div>` : ""}
+            ${ownedLuxury.length ? `<h3 class="closet-group">Atelier · ${money(ownedLuxury.reduce((sum, item) => sum + item.price, 0))}</h3><div class="shop-grid">${ownedLuxury.map((item) => closetCardMarkup(item, true)).join("")}</div>` : ""}
+            <section class="outfit-builder" aria-labelledby="outfitTitle">
+              <h3 id="outfitTitle">Componi cosa indossare</h3>
+              <p>Scegli un paio di scarpe e un outfit completo: maglia più pantalone, oppure un abito. L'accessorio è facoltativo.</p>
+              <div class="outfit-mode" role="group" aria-label="Tipo di outfit">
+                <button type="button" class="${outfitMode === "separates" ? "selected" : ""}" data-outfit-mode="separates" aria-pressed="${outfitMode === "separates"}">Maglia + pantalone</button>
+                <button type="button" class="${outfitMode === "dress" ? "selected" : ""}" data-outfit-mode="dress" aria-pressed="${outfitMode === "dress"}">Abito intero</button>
+              </div>
+              <div class="outfit-fields">
+                ${outfitSelectMarkup("shoes", "Scarpe · obbligatorie")}
+                ${outfitMode === "dress"
+                  ? outfitSelectMarkup("dress", "Abito · obbligatorio")
+                  : `${outfitSelectMarkup("top", "Maglia · obbligatoria")}${outfitSelectMarkup("bottom", "Pantalone o gonna · obbligatori")}`}
+                ${outfitSelectMarkup("accessory", "Accessorio · facoltativo")}
+              </div>
+              <div class="outfit-actions"><span class="outfit-hint">${outfitIsComplete() ? "Outfit completo: puoi indossarlo." : "Completa le scelte obbligatorie per indossare il look."}</span><button type="button" class="cta" data-wear-outfit ${outfitIsComplete() ? "" : "disabled"}>Indossa questo look</button></div>
+              <div class="closet-group">Look indossato</div>${wornOutfitMarkup()}
+            </section>`;
+        }
+        panel.querySelectorAll("[data-job]").forEach((button) => button.addEventListener("click", () => buyJob(jobs[Number(button.dataset.job)])));
+        panel.querySelectorAll("[data-night-job]").forEach((button) => button.addEventListener("click", buyNightJob));
+        panel.querySelectorAll("[data-forced-rest]").forEach((button) => button.addEventListener("click", takeForcedRest));
+        panel.querySelectorAll("[data-sleep]").forEach((button) => button.addEventListener("click", sleepNight));
+        panel.querySelectorAll("[data-wait]").forEach((button) => button.addEventListener("click", waitUntilNight));
+        panel.querySelectorAll("[data-break]").forEach((button) => button.addEventListener("click", () => {
+          if (state.breaksUsed >= 2) return showToast("Hai già usato entrambe le pause di oggi.");
+          const coffee = button.dataset.break === "coffee";
+          if (coffee && state.cash < 2) return showToast("Non hai abbastanza per la pausa caffè.");
+          doAction(() => {
+            state.breaksUsed++;
+            state.energy = clamp(state.energy + (coffee ? 10 : 5));
+            if (coffee) { state.cash -= 2; log("Pausa caffè: −€2, +10 energia."); }
+            else log("Pausa lettura: +5 energia.");
+            showToast(coffee ? "Caffè preso: −€2 e +10 energia." : "Pausa lettura: +5 energia.");
+          }, 15);
+        }));
+        panel.querySelectorAll("[data-pay-rent]").forEach((button) => button.addEventListener("click", payRent));
+        panel.querySelectorAll("[data-supply]").forEach((button) => button.addEventListener("click", () => {
+          doAction(() => {
+            state.cash -= 3; state.bottles++;
+            log("Hai aggiunto una bottiglia d'acqua alla dispensa.");
+            showToast("Bottiglia aggiunta alla dispensa.");
+          }, 30);
+        }));
+        panel.querySelectorAll("[data-use-water]").forEach((button) => button.addEventListener("click", () => {
+          if (state.bottles < 1) return;
+          doAction(() => {
+            state.bottles--; state.water = clamp(state.water + 48);
+            log("Hai bevuto una bottiglia d'acqua.");
+            showToast("Acqua bevuta. Resta idratata.");
+          }, 15);
+        }));
+        panel.querySelectorAll("[data-energy-bar]").forEach((button) => button.addEventListener("click", () => {
+          if (state.energy >= 100 || state.cash < 5) return;
+          const restored = Math.min(10, 100 - state.energy);
+          doAction(() => {
+            state.cash -= 5;
+            state.energy = clamp(state.energy + 10);
+            log(`Barretta energetica: −€5, +${restored} energia.`);
+            showToast(`Barretta consumata: +${restored} energia.`);
+          }, 15);
+        }));
+        panel.querySelectorAll("[data-medkit]").forEach((button) => button.addEventListener("click", () => {
+          const medkit = medkits.find((item) => item.id === button.dataset.medkit);
+          if (!medkit || state.health >= 100 || state.cash < medkit.price) return;
+          const healed = Math.min(medkit.heal, 100 - state.health);
+          state.cash -= medkit.price;
+          state.health = clamp(state.health + healed);
+          log(`${medkit.name}: +${Math.round(healed)} salute, −${money(medkit.price)}.`);
+          checkHealthEmergency();
+          save(); render();
+          if (!state.ended) showToast(`Salute ripristinata di ${Math.round(healed)} punti. ${money(medkit.price)} spesi.`);
+        }));
+        panel.querySelectorAll("[data-meal]").forEach((button) => button.addEventListener("click", () => {
+          const [slot, id] = button.dataset.meal.split(":");
+          const options = slot === "breakfast" ? breakfastOptions : slot === "lunch" ? lunchOptions : dinnerOptions;
+          const meal = options.find((option) => option.id === id);
+          const alreadyOrdered = slot === "breakfast"
+            ? id === "combo"
+              ? state.breakfastOrder.coffee || state.breakfastOrder.croissant
+              : state.breakfastOrder[id]
+            : state.meals[slot];
+          if (!meal || alreadyOrdered || state.cash < meal.price) return;
+          doAction(() => {
+            state.cash -= meal.price;
+            if (slot === "breakfast") {
+              if (id === "combo") {
+                state.breakfastOrder.coffee = true;
+                state.breakfastOrder.croissant = true;
+              } else state.breakfastOrder[id] = true;
+              state.meals.breakfast = true;
+            } else state.meals[slot] = true;
+            state.hunger = clamp(state.hunger + meal.hunger);
+            log(`${slot === "breakfast" ? "Colazione" : slot === "lunch" ? "Pranzo" : "Cena"}: ${meal.name}, −${money(meal.price)}.`);
+            showToast(`${meal.name} consumato. −${money(meal.price)}.`);
+          }, 30);
+        }));
+        panel.querySelectorAll("[data-buy]").forEach((button) => button.addEventListener("click", () => {
+          const [type, id] = button.dataset.buy.split(":");
+          const item = (type === "basic" ? basics : luxury).find((entry) => entry.id === id);
+          const owned = type === "basic" ? state.basics.includes(id) : state.wardrobe.includes(id);
+          if (!item || owned || (item.finale && !state.finaleUnlocked) || state.cash < item.price || !canSpendTime(60)) return;
+          doAction(() => {
+            state.cash -= item.price;
+            if (type === "basic") state.basics.push(item.id);
+            else {
+              state.wardrobe.push(item.id);
+              state.style += item.style;
+              if (item.finale) {
+                const shoes = outfitOptions("shoes")[0];
+                state.outfit = { ...state.outfit, mode: "dress", shoes: shoes ? shoes.id : "", dress: item.id, accessory: "" };
+                state.wornOutfit = { mode: "dress", shoes: shoes ? shoes.id : "", top: "", bottom: "", dress: item.id, accessory: "" };
+                state.awardCelebrationPending = true;
+              }
+            }
+            log(item.finale ? `${item.name} ritirato gratuitamente: hai indossato l'abito e ricevuto il premio di miglior modella al mondo.`
+              : `${item.name} aggiunto${type === "basic" ? " al guardaroba" : " alla collezione couture"}.`);
+            if (!item.finale) showToast(`${item.name}: ${money(item.price)} spesi. Un nuovo pezzo nella tua storia.`);
+          }, 60);
+        }));
+        panel.querySelectorAll("[data-color-item]").forEach((button) => button.addEventListener("click", () => {
+          const item = luxury.find((entry) => entry.id === button.dataset.colorItem);
+          if (!item || item.finale || state.wardrobe.includes(button.dataset.colorItem)) return;
+          state.luxuryColors[button.dataset.colorItem] = Number(button.dataset.colorIndex);
+          save(); render();
+        }));
+        panel.querySelectorAll("[data-runway]").forEach((button) => button.addEventListener("click", performRunway));
+        panel.querySelectorAll("[data-outfit-mode]").forEach((button) => button.addEventListener("click", () => {
+          state.outfit.mode = button.dataset.outfitMode;
+          save(); render();
+        }));
+        panel.querySelectorAll("[data-outfit-slot]").forEach((select) => select.addEventListener("change", () => {
+          const slot = select.dataset.outfitSlot;
+          const value = select.value;
+          if (slot !== "shoes" && slot !== "bottom" && slot !== "top" && slot !== "dress" && slot !== "accessory") return;
+          if (value && !outfitOptions(slot).some((item) => item.id === value)) return;
+          state.outfit[slot] = value;
+          save(); render();
+        }));
+        panel.querySelectorAll("[data-wear-outfit]").forEach((button) => button.addEventListener("click", () => {
+          if (!outfitIsComplete()) return showToast("Completa prima scarpe e outfit.");
+          const mode = state.outfit.mode;
+          state.wornOutfit = {
+            mode,
+            shoes: state.outfit.shoes,
+            top: mode === "separates" ? state.outfit.top : "",
+            bottom: mode === "separates" ? state.outfit.bottom : "",
+            dress: mode === "dress" ? state.outfit.dress : "",
+            accessory: state.outfit.accessory || ""
+          };
+          const wornItems = (mode === "dress"
+            ? [state.wornOutfit.dress, state.wornOutfit.shoes, state.wornOutfit.accessory]
+            : [state.wornOutfit.top, state.wornOutfit.bottom, state.wornOutfit.shoes, state.wornOutfit.accessory])
+            .filter(Boolean).map(findClothingItem).filter(Boolean);
+          log(`Hai indossato: ${wornItems.map((item) => item.name).join(", ")}.`);
+          save(); render(); showToast("Outfit salvato e indossato.");
+        }));
+        panel.querySelectorAll("[data-haircut]").forEach((button) => button.addEventListener("click", () => {
+          const length = Number(button.dataset.haircut);
+          if (length === state.hairLength || state.cash < 20) return;
+          doAction(() => {
+            state.cash -= 20; state.hairLength = length; state.hairGrowthDays = 0; state.style += 6;
+            log(`Taglio ${haircutNames[length]}: −€20. La crescita riparte da oggi.`);
+            showToast(`Nuovo taglio ${haircutNames[length]}: −€20.`);
+          }, 60);
+        }));
+        panel.querySelectorAll("[data-hair-color]").forEach((button) => button.addEventListener("click", () => {
+          const color = Number(button.dataset.hairColor);
+          if (color === state.hair || state.cash < 18) return;
+          doAction(() => {
+            state.cash -= 18; state.hair = color; state.style += 4;
+            log(`Nuovo colore ${hairOptions[color].name.toLowerCase()}: −€18.`);
+            showToast(`Colore capelli aggiornato: −€18.`);
+          }, 60);
+        }));
+        panel.querySelectorAll("[data-beauty]").forEach((button) => button.addEventListener("click", () => {
+          const price = 12;
+          doAction(() => {
+            state.cash -= price; state.style += 4;
+            log("Trattamento sopracciglia: uno sguardo più definito.");
+            showToast("Sopracciglia curate: −€12.");
+          }, 60);
+        }));
+        panel.querySelectorAll("[data-photo]").forEach((button) => button.addEventListener("click", () => {
+          doAction(() => {
+            state.cash -= 38; state.portfolio++; state.style += 12;
+            log(`Nuovo scatto in portfolio: ora ne hai ${state.portfolio}.`);
+            showToast("Scatto salvato nel portfolio. La tua carriera prende forma.");
+          }, 120);
+        }));
+      }
+
+      function payRent() {
+        if (state.rentDebt <= 0 || state.cash < state.rentDebt) return showToast("Non hai abbastanza per saldare l'affitto.");
+        const paid = state.rentDebt;
+        state.cash -= paid; state.rentDebt = 0; state.missedRents = 0;
+        log(`Arretrati saldati: ${money(paid)}. Hai evitato lo sfratto.`);
+        showToast("Affitto saldato. Per ora la stanza è al sicuro.");
+        save(); render();
+      }
+
+      function render() {
+        renderHud();
+        renderPanel();
+        document.querySelectorAll(".tab").forEach((tab) => tab.classList.toggle("active", tab.dataset.tab === state.tab));
+        $("#setupOverlay").classList.toggle("hidden", state.started);
+        const surpriseOverlay = $("#surpriseOverlay");
+        const awardOverlay = $("#awardOverlay");
+        const openingSurprise = state.surpriseNoticePending && surpriseOverlay.classList.contains("hidden");
+        const openingAward = state.awardCelebrationPending && awardOverlay.classList.contains("hidden");
+        surpriseOverlay.classList.toggle("hidden", !state.surpriseNoticePending);
+        awardOverlay.classList.toggle("hidden", !state.awardCelebrationPending);
+        $("#awardAvatar").innerHTML = state.awardCelebrationPending ? avatarMarkup() : "";
+        if (openingSurprise) requestAnimationFrame(() => $("#surpriseButton").focus());
+        if (openingAward) requestAnimationFrame(() => $("#awardContinue").focus());
+      }
+
+      function endGame(won, message) {
+        state.ended = true;
+        $("#endEyebrow").textContent = won ? "Una storia da ricordare" : "La città può aspettare";
+        $("#endTitle").textContent = won ? "La migliore modella del mondo!" : "A volte serve ripartire.";
+        $("#endMessage").textContent = message;
+        $("#endOverlay").classList.remove("hidden");
+      }
+
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.addEventListener("click", () => { state.tab = tab.dataset.tab; save(); render(); });
+      });
+      $("#setupName").addEventListener("input", () => {
+        state.modelName = $("#setupName").value;
+        $("#startButton").disabled = state.cash < 0 || !state.modelName.trim();
+      });
+      $("#startButton").addEventListener("click", () => {
+        const modelName = $("#setupName").value.trim();
+        if (!modelName) return showToast("Scegli un nome per la tua modella.");
+        state.modelName = modelName;
+        state.started = true;
+        log(`Nuova città, nuova partenza. ${state.modelName} ha €32, una stanza e un sogno.`);
+        save(); render(); showToast(`Benvenuta in città, ${state.modelName}. Comincia il tuo primo giorno.`);
+      });
+      $("#payRentButton").addEventListener("click", payRent);
+      $("#surpriseButton").addEventListener("click", () => {
+        state.surpriseNoticePending = false;
+        state.tab = "atelier";
+        save(); render();
+        requestAnimationFrame(() => {
+          const gown = document.getElementById("finaleGownCard");
+          if (gown) {
+            gown.scrollIntoView({ behavior: "smooth", block: "center" });
+            gown.querySelector("[data-buy]")?.focus({ preventScroll: true });
+          }
+        });
+      });
+      $("#awardContinue").addEventListener("click", () => {
+        state.awardCelebrationPending = false;
+        save(); render();
+        showToast("Premio ritirato! La passerella celebrativa ti aspetta a fine settimana.");
+      });
+      $("#resetButton").addEventListener("click", () => {
+        if (!window.confirm("Vuoi ricominciare da zero? La partita salvata verrà sostituita.")) return;
+        state = freshState(); save(); setupScreen(); render();
+        $("#endOverlay").classList.add("hidden"); showToast("Una nuova storia comincia adesso.");
+      });
+      $("#playAgainButton").addEventListener("click", () => {
+        state = freshState(); save(); setupScreen(); render(); $("#endOverlay").classList.add("hidden");
+      });
+
+      if (load()) {
+        setupScreen();
+        render();
+        updateCareerMilestones();
+        render();
+        save();
+        if (!state.ended) checkHealthEmergency();
+        if (state.ended) {
+          const won = state.finalShowComplete;
+          endGame(won, won
+            ? "Con l'abito dorato da principessa hai conquistato l'ultima passerella. Sei la miglior modella al mondo!"
+            : "Questa partita si è conclusa. Ricomincia e prova una strategia diversa.");
+        }
+        if (state.ended) save();
+      } else {
+        setupScreen(); render();
+      }
+    })();
+  </script>
+</body>
+</html>
